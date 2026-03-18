@@ -139,6 +139,8 @@ body { background: var(--bg); color: var(--text); font-family: var(--sans); min-
 .day-log-meta strong { font-size: 13px; color: var(--text); }
 .day-log-meta span { font-size: 12px; color: var(--accent); font-family: var(--mono); }
 .day-log-halle { font-size: 12px; color: var(--text2); }
+.training-list { display: flex; flex-direction: column; gap: 8px; }
+.training-item { display: grid; grid-template-columns: 1.4fr 0.9fr 0.7fr 32px; gap: 8px; align-items: center; }
 .empty { text-align: center; padding: 60px 20px; color: var(--text3); }
 .empty p { font-size: 14px; margin-top: 8px; }
 .no-user { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 60vh; color: var(--text3); gap: 12px; }
@@ -212,10 +214,6 @@ body { background: var(--bg); color: var(--text); font-family: var(--sans); min-
         <div class="day-toggle"><input type="checkbox" id="d5" value="5"><label for="d5">Sa</label></div>
       </div>
     </div>
-    <div class="form-group">
-      <label>Gruppe / Kürzel</label>
-      <input type="text" id="nu_gruppe" placeholder="z.B. LGNK, LGUSCKade">
-    </div>
     <div class="modal-actions">
       <button class="btn-secondary" onclick="closeModal('newUserModal')">Abbrechen</button>
       <button class="btn-primary" onclick="createUser()">Anlegen</button>
@@ -279,8 +277,10 @@ function loadState() {
 function saveState() {
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    return true;
   } catch(e) {
     console.warn('localStorage nicht verfügbar:', e);
+    return false;
   }
 }
 
@@ -290,8 +290,6 @@ function seedDefaultUser() {
   const user = {
     id: 'user_1',
     name: 'Mein Profil',
-    gruppe: 'LGNK + LGUSCKade',
-    trainGroups: ['LGNK','LGUSCKade'],
     kontingent: 320,
     hoursPerSession: 3,
     trainDays: [0,1,4],
@@ -345,22 +343,51 @@ function isFerien(dateStr, ferien) {
 }
 function addDays(d, n) { const r = new Date(d); r.setDate(r.getDate()+n); return r; }
 function today() { return toISO(new Date()); }
+function normalizeTrainings(user) {
+  if (Array.isArray(user.trainings) && user.trainings.length > 0) {
+    user.trainings = user.trainings
+      .map((t, idx) => ({
+        id: t.id || `tr_${idx}_${Date.now()}`,
+        label: (t.label || 'Training').trim(),
+        wd: Number.isInteger(t.wd) ? t.wd : 0,
+        sollHours: Number.isFinite(Number(t.sollHours)) && Number(t.sollHours) > 0 ? Number(t.sollHours) : (user.hoursPerSession || 3)
+      }))
+      .filter(t => t.wd >= 0 && t.wd <= 5);
+    if (user.trainings.length > 0) return user.trainings;
+  }
+  const fallbackDays = Array.isArray(user.trainDays) && user.trainDays.length ? user.trainDays : [0,1,4];
+  user.trainings = fallbackDays.map((wd, idx) => ({
+    id: `tr_${idx}_${Date.now()}`,
+    label: `Training ${idx+1}`,
+    wd,
+    sollHours: user.hoursPerSession || 3
+  }));
+  return user.trainings;
+}
+function defaultLogHours(user) {
+  const trainings = normalizeTrainings(user);
+  return trainings[0]?.sollHours || user.hoursPerSession || 3;
+}
 
 // ── Compute Soll-Kalender ─────────────────────────────────────────────────────
 function computeKalender(user) {
   const rows = [];
+  const trainings = normalizeTrainings(user);
   let d = new Date(YEAR, 0, 1);
   const end = new Date(YEAR, 11, 31);
   let kum = 0;
   while (d <= end) {
     const dow = d.getDay();
     const wd = dow === 0 ? 6 : dow - 1;
-    if (user.trainDays.includes(wd)) {
-      const ds = toISO(d);
-      const ferienName = isFerien(ds, user.ferien);
-      const zaehlt = !ferienName;
-      if (zaehlt) kum += user.hoursPerSession;
-      rows.push({ date: ds, wd, zaehlt, ferienName, kum });
+    const ds = toISO(d);
+    const dayTrainings = trainings.filter(t => t.wd === wd);
+    if (dayTrainings.length) {
+      dayTrainings.forEach(t => {
+        const ferienName = isFerien(ds, user.ferien);
+        const zaehlt = !ferienName;
+        if (zaehlt) kum += t.sollHours;
+        rows.push({ date: ds, wd, zaehlt, ferienName, kum, sollHours: t.sollHours, trainingLabel: t.label });
+      });
     }
     d = addDays(d, 1);
   }
@@ -371,9 +398,9 @@ function computeStats(user) {
   const todayStr = today();
   const logDates = new Set(user.log.map(l => l.date));
   const istTotal = user.log.reduce((s,l) => s+l.hours, 0);
-  const totalSoll = kal.filter(r=>r.zaehlt).reduce((s,r)=>s+user.hoursPerSession, 0) || 0;
+  const totalSoll = kal.filter(r=>r.zaehlt).reduce((s,r)=>s+r.sollHours, 0) || 0;
   const puffer = totalSoll - user.kontingent;
-  const sollHeute = kal.filter(r=>r.zaehlt && r.date <= todayStr).reduce((s,r)=>s+user.hoursPerSession, 0);
+  const sollHeute = kal.filter(r=>r.zaehlt && r.date <= todayStr).reduce((s,r)=>s+r.sollHours, 0);
   const missed = kal.filter(r=>r.zaehlt && r.date < todayStr && !logDates.has(r.date));
   const diff = istTotal - sollHeute;
   const pufferRest = puffer + diff;
@@ -417,7 +444,7 @@ function renderAll() {
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px">
       <div>
         <h2 style="font-size:22px;font-weight:600">${user.name}</h2>
-        <p style="color:var(--text3);font-size:13px;font-family:var(--mono);margin-top:3px">${user.gruppe || ''} · ${user.kontingent}h Jahreskontingent · ${user.trainDays.map(d=>WEEKDAYS[d]).join(', ')}</p>
+        <p style="color:var(--text3);font-size:13px;font-family:var(--mono);margin-top:3px">${user.kontingent}h Jahreskontingent · ${normalizeTrainings(user).map(t=>`${WEEKDAYS[t.wd]} ${t.sollHours}h`).join(' · ')}</p>
       </div>
       <div style="display:flex;gap:8px">
         <button class="btn-secondary" onclick="renderSetup('${user.id}')">⚙ Einstellungen</button>
@@ -449,7 +476,7 @@ function renderDashboard(user, stats) {
   const pufferClass = pufferRest >= 0 ? 'green' : 'red';
   const months = ['Jan','Feb','Mär','Apr','Mai','Jun','Jul','Aug','Sep','Okt','Nov','Dez'];
   const monthCards = months.map((mn, mi) => {
-    const mSoll = stats.kal.filter(r=>r.zaehlt && monthIndexFromISO(r.date)===mi).length * user.hoursPerSession;
+    const mSoll = stats.kal.filter(r=>r.zaehlt && monthIndexFromISO(r.date)===mi).reduce((s,r)=>s+r.sollHours,0);
     const mIst  = user.log.filter(l=>monthIndexFromISO(l.date)===mi).reduce((s,l)=>s+l.hours,0);
     const mDiff = mIst - mSoll;
     const ferienInMonth = stats.kal.some(r=>r.ferienName && monthIndexFromISO(r.date)===mi);
@@ -506,7 +533,7 @@ function renderKalender(user, stats) {
       else if (logDates.has(r.date)) dayMap[day] = {type:'done'};
       else                        dayMap[day] = {type:'missed'};
     });
-    const mSoll   = kal.filter(r=>r.zaehlt && monthIndexFromISO(r.date)===mi).length * user.hoursPerSession;
+    const mSoll   = kal.filter(r=>r.zaehlt && monthIndexFromISO(r.date)===mi).reduce((s,r)=>s+r.sollHours,0);
     const mIst    = user.log.filter(l=>monthIndexFromISO(l.date)===mi).reduce((s,l)=>s+l.hours,0);
     const mDone   = kal.filter(r=>r.zaehlt && r.date<=todayStr && logDates.has(r.date) && monthIndexFromISO(r.date)===mi).length;
     const mMissed = kal.filter(r=>r.zaehlt && r.date<todayStr && !logDates.has(r.date) && monthIndexFromISO(r.date)===mi).length;
@@ -565,31 +592,34 @@ function renderKalender(user, stats) {
 // ── Trainingslog ──────────────────────────────────────────────────────────────
 function renderLog(user, stats) {
   const sorted = [...user.log].sort((a,b)=>b.date.localeCompare(a.date));
+  const trainingName = (entry) => (entry.training || entry.gruppe || 'Training');
   const rows = sorted.map(l => {
-    const gc = l.gruppe==='LGNK'?'lgnk':l.gruppe==='LGUSCKade'?'lgusk':'other';
+    const gc = 'other';
     return `<tr>
       <td style="font-family:var(--mono);color:var(--text2)">${l.date}</td>
-      <td><span class="badge ${gc}">${l.gruppe}</span></td>
+      <td><span class="badge ${gc}">${trainingName(l)}</span></td>
       <td>${l.halle||'–'}</td>
       <td style="font-family:var(--mono);color:var(--accent)">${l.hours}h</td>
       <td><button class="btn-del" onclick="deleteLog('${user.id}','${l.id}')" title="Löschen">×</button></td>
     </tr>`;
   }).join('') || `<tr><td colspan="5"><div class="empty"><p>Noch keine Einträge.</p></div></td></tr>`;
-  const groups = (user.trainGroups && user.trainGroups.length) ? user.trainGroups : ['LGNK','LGUSCKade'];
-  const gruppenOptions = [...new Set([...user.log.map(l=>l.gruppe),...groups])].map(g=>`<option>${g}</option>`).join('');
+  const options = [...new Set([
+    ...normalizeTrainings(user).map(t => t.label),
+    ...user.log.map(l => trainingName(l))
+  ])].map(t=>`<option>${t}</option>`).join('');
   document.getElementById('tabContent').innerHTML = `
     <div class="log-form">
       <div class="form-row">
         <div class="form-group"><label>Datum</label><input type="date" id="lf_date" value="${today()}"></div>
-        <div class="form-group"><label>Gruppe</label><select id="lf_gruppe">${gruppenOptions}</select></div>
+        <div class="form-group"><label>Training</label><select id="lf_training">${options}</select></div>
         <div class="form-group"><label>Kletterhalle</label><input type="text" id="lf_halle" placeholder="z.B. Element"></div>
-        <div class="form-group"><label>Stunden</label><input type="number" id="lf_hours" value="${user.hoursPerSession}" min="0.5" max="12" step="0.5" style="width:80px"></div>
+        <div class="form-group"><label>Stunden</label><input type="number" id="lf_hours" value="${defaultLogHours(user)}" min="0.5" max="12" step="0.5" style="width:80px"></div>
         <button class="btn-primary" onclick="addLog('${user.id}')">+ Eintragen</button>
       </div>
     </div>
     <div style="background:var(--bg2);border:1px solid var(--border);border-radius:12px;overflow:hidden">
       <table class="log-table">
-        <thead><tr><th>Datum</th><th>Gruppe</th><th>Halle</th><th>Stunden</th><th></th></tr></thead>
+        <thead><tr><th>Datum</th><th>Training</th><th>Halle</th><th>Stunden</th><th></th></tr></thead>
         <tbody>${rows}</tbody>
       </table>
     </div>
@@ -600,12 +630,16 @@ function renderLog(user, stats) {
 function renderSetup(userId) {
   const user = state.users.find(u=>u.id===userId);
   if (!user) return;
+  const trainings = normalizeTrainings(user);
   const main = document.getElementById('mainContent');
-  const dayToggles = WEEKDAYS.slice(0,6).map((wd,i) => `
-    <div class="day-toggle">
-      <input type="checkbox" id="sd${i}" value="${i}" ${user.trainDays.includes(i)?'checked':''}>
-      <label for="sd${i}">${wd}</label>
-    </div>`).join('');
+  const trainingItems = trainings.map((t, i) => `
+    <div class="training-item">
+      <input type="text" class="tr-name" data-idx="${i}" value="${t.label}" placeholder="Trainingname">
+      <select class="tr-day" data-idx="${i}">${WEEKDAYS.slice(0,6).map((wd, wdIdx)=>`<option value="${wdIdx}" ${wdIdx===t.wd?'selected':''}>${wd}</option>`).join('')}</select>
+      <input type="number" class="tr-hours" data-idx="${i}" min="0.5" step="0.5" value="${t.sollHours}">
+      <button class="btn-icon" onclick="deleteTraining('${userId}',${i})">×</button>
+    </div>
+  `).join('');
   const ferienItems = user.ferien.map((f,i) => `
     <div class="ferien-item" id="fi_${i}">
       <input type="text"  class="fi-name"  data-idx="${i}" value="${f.name}"  style="flex:1.2;font-size:12px">
@@ -625,23 +659,22 @@ function renderSetup(userId) {
           <label>Name</label>
           <input type="text" id="s_name" value="${user.name}">
         </div>
-        <div class="form-group" style="margin-bottom:14px">
-          <label>Gruppe / Kürzel</label>
-          <input type="text" id="s_gruppe" value="${user.gruppe||''}">
-        </div>
         <div class="form-group-inline" style="margin-bottom:14px">
           <div class="form-group">
             <label>Jahreskontingent (h)</label>
             <input type="number" id="s_kontingent" value="${user.kontingent}" min="1">
           </div>
-          <div class="form-group">
-            <label>Stunden pro Session</label>
-            <input type="number" id="s_hours" value="${user.hoursPerSession}" min="0.5" step="0.5">
-          </div>
         </div>
         <div class="form-group" style="margin-bottom:14px">
-          <label>Trainingstage</label>
-          <div class="day-toggles">${dayToggles}</div>
+          <label>Trainings mit Soll-Zeit</label>
+          <div style="display:grid;grid-template-columns:1.4fr 0.9fr 0.7fr 32px;gap:8px;margin-bottom:6px">
+            <span style="font-size:10px;color:var(--text3);font-family:var(--mono);text-transform:uppercase;letter-spacing:.05em">Training</span>
+            <span style="font-size:10px;color:var(--text3);font-family:var(--mono);text-transform:uppercase;letter-spacing:.05em">Tag</span>
+            <span style="font-size:10px;color:var(--text3);font-family:var(--mono);text-transform:uppercase;letter-spacing:.05em">Soll (h)</span>
+            <span></span>
+          </div>
+          <div class="training-list" id="trainingList">${trainingItems}</div>
+          <button class="btn-add-ferien" style="margin-top:8px" onclick="addTraining('${userId}')">+ Training hinzufügen</button>
         </div>
         <div class="form-group">
           <label>Farbe</label>
@@ -706,6 +739,30 @@ function addFerien(userId) {
     renderSetup(userId);
   }
 }
+function addTraining(userId) {
+  const user = state.users.find(u=>u.id===userId);
+  if (!user) return;
+  const trainings = normalizeTrainings(user);
+  trainings.push({
+    id: `tr_${Date.now()}`,
+    label: 'Training',
+    wd: 0,
+    sollHours: defaultLogHours(user)
+  });
+  saveState();
+  renderSetup(userId);
+}
+function deleteTraining(userId, idx) {
+  const user = state.users.find(u=>u.id===userId);
+  if (!user) return;
+  const trainings = normalizeTrainings(user);
+  trainings.splice(idx, 1);
+  if (trainings.length === 0) {
+    trainings.push({ id: `tr_${Date.now()}`, label: 'Training', wd: 0, sollHours: 3 });
+  }
+  saveState();
+  renderSetup(userId);
+}
 function setColor(userId, color) {
   const user = state.users.find(u=>u.id===userId);
   if (user) { user.color = color; saveState(); renderSetup(userId); renderSidebar(); }
@@ -718,40 +775,46 @@ function setColor(userId, color) {
 //   2. All DOM reads use null checks – a missing element can no longer throw
 //      a TypeError that silently aborts the save.
 //   3. startEl / endEl in the ferien loop are now guarded (were missing before).
-//   4. trainGroups is derived from the gruppe field so the log dropdown stays
-//      in sync when groups are renamed.
 function saveSetup(userId) {
   const user = state.users.find(u=>u.id===userId);
   if (!user) return;
 
   // Profile fields – safe null checks throughout
   const nameEl   = document.getElementById('s_name');
-  const gruppeEl = document.getElementById('s_gruppe');
   const kontEl   = document.getElementById('s_kontingent');
-  const hoursEl  = document.getElementById('s_hours');
 
   if (nameEl   && nameEl.value.trim())   user.name            = nameEl.value.trim();
-  if (gruppeEl)                          user.gruppe          = gruppeEl.value.trim();
   if (kontEl) {
     const k = parseFloat(kontEl.value);
     if (!isNaN(k) && k > 0)             user.kontingent      = k;
   }
-  if (hoursEl) {
-    const h = parseFloat(hoursEl.value);
-    if (!isNaN(h) && h > 0)             user.hoursPerSession  = h;
-  }
 
-  // Keep trainGroups in sync with the gruppe display field
-  if (user.gruppe) {
-    const parsed = user.gruppe.split(/[,+]/).map(g => g.trim()).filter(g => g.length > 0);
-    if (parsed.length > 0) user.trainGroups = parsed;
+  // Trainings with per-session soll hours
+  const trainRows = document.querySelectorAll('#trainingList .training-item');
+  if (trainRows.length > 0) {
+    const parsedTrainings = [];
+    trainRows.forEach((row, idx) => {
+      const nameEl2 = row.querySelector('.tr-name');
+      const dayEl = row.querySelector('.tr-day');
+      const hoursEl2 = row.querySelector('.tr-hours');
+      if (!nameEl2 || !dayEl || !hoursEl2) return;
+      const label = nameEl2.value.trim() || `Training ${idx+1}`;
+      const wd = parseInt(dayEl.value, 10);
+      const sh = parseFloat(hoursEl2.value);
+      if (!Number.isInteger(wd) || wd < 0 || wd > 5) return;
+      if (!Number.isFinite(sh) || sh <= 0) return;
+      parsedTrainings.push({
+        id: `tr_${idx}_${Date.now()}`,
+        label,
+        wd,
+        sollHours: sh
+      });
+    });
+    if (parsedTrainings.length > 0) user.trainings = parsedTrainings;
   }
-
-  // Training days
-  const checkboxes = document.querySelectorAll('#sd0,#sd1,#sd2,#sd3,#sd4,#sd5');
-  if (checkboxes.length > 0) {
-    user.trainDays = Array.from(checkboxes).filter(cb=>cb.checked).map(cb=>parseInt(cb.value));
-  }
+  normalizeTrainings(user);
+  user.trainDays = [...new Set(user.trainings.map(t => t.wd))];
+  user.hoursPerSession = defaultLogHours(user);
 
   // Ferien – FIX: guard startEl and endEl for null before accessing .value
   document.querySelectorAll('#ferienList .ferien-item').forEach(row => {
@@ -767,10 +830,9 @@ function saveSetup(userId) {
   });
 
   // saveState() no longer throws (try-catch inside), so renderAll() is always reached
-  saveState();
-  currentTab = 'kalender';
-  renderAll();
-  showToast('Einstellungen gespeichert');
+  const ok = saveState();
+  renderSetup(userId);
+  showToast(ok ? 'Einstellungen gespeichert' : 'Speichern fehlgeschlagen');
 }
 
 function deleteUser(userId) {
@@ -785,14 +847,14 @@ function addLog(userId) {
   const user = state.users.find(u=>u.id===userId);
   if (!user) return;
   const date   = document.getElementById('lf_date').value;
-  const gruppe = document.getElementById('lf_gruppe').value;
+  const training = document.getElementById('lf_training').value;
   const halle  = document.getElementById('lf_halle').value.trim();
   const hours  = parseFloat(document.getElementById('lf_hours').value);
-  if (!date || !gruppe || !Number.isFinite(hours) || hours <= 0) {
+  if (!date || !training || !Number.isFinite(hours) || hours <= 0) {
     showToast('Bitte gueltige Stunden > 0 eintragen');
     return;
   }
-  user.log.push({ id:'l'+Date.now(), date, gruppe, halle, hours });
+  user.log.push({ id:'l'+Date.now(), date, training, halle, hours });
   saveState(); renderAll();
 }
 function deleteLog(userId, logId) {
@@ -808,7 +870,7 @@ function openDayDetails(userId, dateStr) {
   const dayLogs = [...user.log]
     .filter(l => l.date === dateStr)
     .sort((a, b) => b.id.localeCompare(a.id));
-  const calRow = computeKalender(user).find(r => r.date === dateStr);
+  const dayRows = computeKalender(user).filter(r => r.date === dateStr);
   const titleDate = new Date(`${dateStr}T12:00:00`).toLocaleDateString('de-DE', {
     weekday: 'long',
     day: '2-digit',
@@ -818,24 +880,27 @@ function openDayDetails(userId, dateStr) {
   const todayStr = today();
   let statusText = 'Kein Soll-Trainingstag';
   let statusColor = 'var(--text2)';
-  if (calRow?.ferienName) {
-    statusText = `Ferien: ${calRow.ferienName}`;
+  const daySoll = dayRows.filter(r=>r.zaehlt).reduce((s,r)=>s+r.sollHours,0);
+  const labels = [...new Set(dayRows.map(r=>r.trainingLabel).filter(Boolean))];
+  const labelText = labels.length ? ` (${labels.join(', ')})` : '';
+  if (dayRows.some(r => r.ferienName)) {
+    statusText = `Ferien: ${dayRows.find(r => r.ferienName)?.ferienName || 'Ferien'}${labelText}`;
     statusColor = 'var(--amber)';
-  } else if (calRow && dateStr > todayStr) {
-    statusText = 'Ausstehender Soll-Termin';
+  } else if (dayRows.length > 0 && dateStr > todayStr) {
+    statusText = `Ausstehender Soll-Termin · ${daySoll}h${labelText}`;
     statusColor = 'var(--accent)';
-  } else if (calRow && dayLogs.length > 0) {
-    statusText = 'Geleistet';
+  } else if (dayRows.length > 0 && dayLogs.length > 0) {
+    statusText = `Geleistet · Soll ${daySoll}h${labelText}`;
     statusColor = 'var(--green)';
-  } else if (calRow) {
-    statusText = 'Ausgefallen (kein Log-Eintrag)';
+  } else if (dayRows.length > 0) {
+    statusText = `Ausgefallen (kein Log-Eintrag) · Soll ${daySoll}h${labelText}`;
     statusColor = 'var(--red)';
   }
   const logsHtml = dayLogs.length
     ? dayLogs.map(l => `
       <div class="day-log-card">
         <div class="day-log-meta">
-          <strong>${l.gruppe}</strong>
+          <strong>${l.training || l.gruppe || 'Training'}</strong>
           <span>${l.hours}h</span>
         </div>
         <div class="day-log-halle">${l.halle || 'Halle nicht gesetzt'}</div>
@@ -859,7 +924,6 @@ function openNewUserModal() {
   document.getElementById('nu_name').value = '';
   document.getElementById('nu_kontingent').value = '320';
   document.getElementById('nu_hours').value = '3';
-  document.getElementById('nu_gruppe').value = '';
   document.querySelectorAll('#nu_days input').forEach(cb=>cb.checked=false);
   document.getElementById('newUserModal').classList.add('open');
 }
@@ -868,19 +932,22 @@ function createUser() {
   const name = document.getElementById('nu_name').value.trim();
   if (!name) return;
   const trainDays  = Array.from(document.querySelectorAll('#nu_days input')).filter(cb=>cb.checked).map(cb=>parseInt(cb.value));
-  const gruppeVal  = document.getElementById('nu_gruppe').value.trim();
-  const trainGroups = gruppeVal
-    ? gruppeVal.split(/[,+]/).map(g=>g.trim()).filter(g=>g.length>0)
-    : ['LGNK','LGUSCKade'];
+  const defaultHours = parseFloat(document.getElementById('nu_hours').value)||3;
+  const normalizedTrainDays = trainDays.length ? trainDays : [0,1,4];
+  const trainings = normalizedTrainDays.map((wd, idx) => ({
+    id: `tr_${Date.now()}_${idx}`,
+    label: `Training ${idx+1}`,
+    wd,
+    sollHours: defaultHours
+  }));
   const user = {
     id: 'user_'+Date.now(),
     name,
-    gruppe: gruppeVal,
     kontingent: parseFloat(document.getElementById('nu_kontingent').value)||320,
-    hoursPerSession: parseFloat(document.getElementById('nu_hours').value)||3,
-    trainDays: trainDays.length ? trainDays : [0,1,4],
+    hoursPerSession: defaultHours,
+    trainDays: normalizedTrainDays,
     color: AVATARS[state.users.length % AVATARS.length],
-    trainGroups,
+    trainings,
     ferien: JSON.parse(JSON.stringify(DEFAULT_FERIEN)),
     log: []
   };
