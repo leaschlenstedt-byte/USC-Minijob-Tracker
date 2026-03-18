@@ -130,6 +130,15 @@ body { background: var(--bg); color: var(--text); font-family: var(--sans); min-
 .modal h2 { font-size: 18px; font-weight: 600; margin-bottom: 20px; }
 .modal .form-group { margin-bottom: 14px; }
 .modal-actions { display: flex; gap: 10px; margin-top: 20px; justify-content: flex-end; }
+.cal-day { border: none; cursor: pointer; transition: transform 0.1s, filter 0.1s; }
+.cal-day:hover { filter: brightness(1.08); transform: translateY(-1px); }
+.cal-day:active { transform: translateY(0); }
+.cal-day-details { display: flex; flex-direction: column; gap: 10px; margin-top: 14px; }
+.day-log-card { background: var(--bg3); border: 1px solid var(--border); border-radius: 10px; padding: 12px; }
+.day-log-meta { display: flex; justify-content: space-between; gap: 8px; margin-bottom: 6px; }
+.day-log-meta strong { font-size: 13px; color: var(--text); }
+.day-log-meta span { font-size: 12px; color: var(--accent); font-family: var(--mono); }
+.day-log-halle { font-size: 12px; color: var(--text2); }
 .empty { text-align: center; padding: 60px 20px; color: var(--text3); }
 .empty p { font-size: 14px; margin-top: 8px; }
 .no-user { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 60vh; color: var(--text3); gap: 12px; }
@@ -210,6 +219,17 @@ body { background: var(--bg); color: var(--text); font-family: var(--sans); min-
     <div class="modal-actions">
       <button class="btn-secondary" onclick="closeModal('newUserModal')">Abbrechen</button>
       <button class="btn-primary" onclick="createUser()">Anlegen</button>
+    </div>
+  </div>
+</div>
+
+<!-- Day Details Modal -->
+<div class="modal-overlay" id="dayDetailModal">
+  <div class="modal">
+    <h2 id="dayDetailTitle">Tag</h2>
+    <div id="dayDetailContent"></div>
+    <div class="modal-actions">
+      <button class="btn-secondary" onclick="closeModal('dayDetailModal')">Schließen</button>
     </div>
   </div>
 </div>
@@ -426,7 +446,7 @@ function renderDashboard(user, stats) {
   const pct = Math.min(100, Math.round(istTotal / user.kontingent * 100));
   const diffClass = diff >= 0 ? 'green' : 'red';
   const diffSign = diff >= 0 ? '+' : '';
-  const pufferClass = pufferRest > 10 ? 'amber' : 'red';
+  const pufferClass = pufferRest >= 0 ? 'green' : 'red';
   const months = ['Jan','Feb','Mär','Apr','Mai','Jun','Jul','Aug','Sep','Okt','Nov','Dez'];
   const monthCards = months.map((mn, mi) => {
     const mSoll = stats.kal.filter(r=>r.zaehlt && monthIndexFromISO(r.date)===mi).length * user.hoursPerSession;
@@ -510,7 +530,7 @@ function renderKalender(user, stats) {
       else if (info.type==='done')    { bg='rgba(52,211,153,0.12)'; color='var(--green)'; fw='600'; }
       else if (info.type==='missed')  { bg='rgba(248,113,113,0.12)'; color='var(--red)'; fw='600'; }
       else if (info.type==='future')  { bg='rgba(79,156,249,0.08)'; color='var(--accent)'; }
-      cells += `<div style="background:${bg};color:${color};font-weight:${fw};border-radius:5px;text-align:center;padding:4px 2px;font-size:12px;font-family:var(--mono);${border}" title="${info?.type==='done'?'✓ geleistet':info?.type==='missed'?'✗ ausgefallen':info?.type==='ferien'?info.label:info?.type==='future'?'ausstehend':''}">${day}</div>`;
+      cells += `<button type="button" class="cal-day" onclick="openDayDetails('${user.id}','${ds}')" style="background:${bg};color:${color};font-weight:${fw};border-radius:5px;text-align:center;padding:4px 2px;font-size:12px;font-family:var(--mono);${border}" title="${info?.type==='done'?'✓ geleistet':info?.type==='missed'?'✗ ausgefallen':info?.type==='ferien'?info.label:info?.type==='future'?'ausstehend':'Kein Soll-Termin'}">${day}</button>`;
     }
     const diffColor = mSoll===0?'var(--text3)':mIst>=mSoll?'var(--green)':'var(--red)';
     const diffVal   = mSoll===0?'–':(mIst-mSoll>=0?'+':'')+(mIst-mSoll)+'h';
@@ -782,6 +802,58 @@ function deleteLog(userId, logId) {
   saveState(); renderAll();
 }
 
+function openDayDetails(userId, dateStr) {
+  const user = state.users.find(u=>u.id===userId);
+  if (!user) return;
+  const dayLogs = [...user.log]
+    .filter(l => l.date === dateStr)
+    .sort((a, b) => b.id.localeCompare(a.id));
+  const calRow = computeKalender(user).find(r => r.date === dateStr);
+  const titleDate = new Date(`${dateStr}T12:00:00`).toLocaleDateString('de-DE', {
+    weekday: 'long',
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric'
+  });
+  const todayStr = today();
+  let statusText = 'Kein Soll-Trainingstag';
+  let statusColor = 'var(--text2)';
+  if (calRow?.ferienName) {
+    statusText = `Ferien: ${calRow.ferienName}`;
+    statusColor = 'var(--amber)';
+  } else if (calRow && dateStr > todayStr) {
+    statusText = 'Ausstehender Soll-Termin';
+    statusColor = 'var(--accent)';
+  } else if (calRow && dayLogs.length > 0) {
+    statusText = 'Geleistet';
+    statusColor = 'var(--green)';
+  } else if (calRow) {
+    statusText = 'Ausgefallen (kein Log-Eintrag)';
+    statusColor = 'var(--red)';
+  }
+  const logsHtml = dayLogs.length
+    ? dayLogs.map(l => `
+      <div class="day-log-card">
+        <div class="day-log-meta">
+          <strong>${l.gruppe}</strong>
+          <span>${l.hours}h</span>
+        </div>
+        <div class="day-log-halle">${l.halle || 'Halle nicht gesetzt'}</div>
+      </div>
+    `).join('')
+    : `<div class="day-log-card"><div class="day-log-halle">Kein Trainingslog-Eintrag für dieses Datum.</div></div>`;
+  document.getElementById('dayDetailTitle').textContent = titleDate;
+  document.getElementById('dayDetailContent').innerHTML = `
+    <div style="font-size:12px;color:var(--text3);font-family:var(--mono);margin-bottom:8px">Status im Soll-Kalender</div>
+    <div style="font-size:14px;color:${statusColor};font-weight:600">${statusText}</div>
+    <div class="cal-day-details">
+      <div style="font-size:12px;color:var(--text3);font-family:var(--mono);text-transform:uppercase;letter-spacing:.05em">Trainingslog</div>
+      ${logsHtml}
+    </div>
+  `;
+  document.getElementById('dayDetailModal').classList.add('open');
+}
+
 // ── New user modal ────────────────────────────────────────────────────────────
 function openNewUserModal() {
   document.getElementById('nu_name').value = '';
@@ -820,6 +892,9 @@ function createUser() {
 }
 document.getElementById('newUserModal').addEventListener('click', function(e) {
   if (e.target === this) closeModal('newUserModal');
+});
+document.getElementById('dayDetailModal').addEventListener('click', function(e) {
+  if (e.target === this) closeModal('dayDetailModal');
 });
 
 // ── Reset ─────────────────────────────────────────────────────────────────────
