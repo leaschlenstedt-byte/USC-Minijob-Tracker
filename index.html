@@ -217,23 +217,23 @@ body { background: var(--bg); color: var(--text); font-family: var(--sans); min-
 <script>
 // ── State ─────────────────────────────────────────────────────────────────────
 const STORAGE_KEY = 'trainings_tracker_v1';
-const YEAR = 2026;
+const YEAR = new Date().getFullYear();
 const AVATARS = ['#4f9cf9','#34d399','#f87171','#fbbf24','#a78bfa','#fb923c','#e879f9','#2dd4bf'];
 const WEEKDAYS = ['Mo','Di','Mi','Do','Fr','Sa','So'];
 const DEFAULT_FERIEN = [
-  {name:'Weihnachtsferien/Neujahr', start:'2026-01-01', end:'2026-01-06'},
-  {name:'Frühjahrsferien',          start:'2026-02-16', end:'2026-02-20'},
-  {name:'Osterferien',              start:'2026-03-30', end:'2026-04-10'},
-  {name:'Pfingstferien',            start:'2026-05-26', end:'2026-06-05'},
-  {name:'Sommerferien',             start:'2026-08-03', end:'2026-09-14'},
-  {name:'Herbstferien',             start:'2026-11-02', end:'2026-11-06'},
-  {name:'Weihnachtsferien',         start:'2026-12-24', end:'2026-12-31'},
-  {name:'Heilige Drei Könige',      start:'2026-01-06', end:'2026-01-06'},
-  {name:'Karfreitag',               start:'2026-04-03', end:'2026-04-03'},
-  {name:'Ostermontag',              start:'2026-04-06', end:'2026-04-06'},
-  {name:'Maifeiertag',              start:'2026-05-01', end:'2026-05-01'},
-  {name:'Pfingstmontag',            start:'2026-05-25', end:'2026-05-25'},
-  {name:'1. Weihnachtstag',         start:'2026-12-25', end:'2026-12-25'},
+  {name:'Weihnachtsferien/Neujahr', start:`${YEAR}-01-01`, end:`${YEAR}-01-06`},
+  {name:'Frühjahrsferien',          start:`${YEAR}-02-16`, end:`${YEAR}-02-20`},
+  {name:'Osterferien',              start:`${YEAR}-03-30`, end:`${YEAR}-04-10`},
+  {name:'Pfingstferien',            start:`${YEAR}-05-26`, end:`${YEAR}-06-05`},
+  {name:'Sommerferien',             start:`${YEAR}-08-03`, end:`${YEAR}-09-14`},
+  {name:'Herbstferien',             start:`${YEAR}-11-02`, end:`${YEAR}-11-06`},
+  {name:'Weihnachtsferien',         start:`${YEAR}-12-24`, end:`${YEAR}-12-31`},
+  {name:'Heilige Drei Könige',      start:`${YEAR}-01-06`, end:`${YEAR}-01-06`},
+  {name:'Karfreitag',               start:`${YEAR}-04-03`, end:`${YEAR}-04-03`},
+  {name:'Ostermontag',              start:`${YEAR}-04-06`, end:`${YEAR}-04-06`},
+  {name:'Maifeiertag',              start:`${YEAR}-05-01`, end:`${YEAR}-05-01`},
+  {name:'Pfingstmontag',            start:`${YEAR}-05-25`, end:`${YEAR}-05-25`},
+  {name:'1. Weihnachtstag',         start:`${YEAR}-12-25`, end:`${YEAR}-12-25`},
 ];
 let state = { users: [], activeUserId: null };
 let currentTab = 'dashboard';
@@ -312,6 +312,10 @@ function seedDefaultUser() {
 // ── Date helpers ──────────────────────────────────────────────────────────────
 function toISO(d) {
   return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+}
+function monthIndexFromISO(dateStr) {
+  const month = Number(dateStr.slice(5, 7));
+  return Number.isFinite(month) ? month - 1 : -1;
 }
 function isFerien(dateStr, ferien) {
   for (const f of ferien) {
@@ -425,10 +429,10 @@ function renderDashboard(user, stats) {
   const pufferClass = pufferRest > 10 ? 'amber' : 'red';
   const months = ['Jan','Feb','Mär','Apr','Mai','Jun','Jul','Aug','Sep','Okt','Nov','Dez'];
   const monthCards = months.map((mn, mi) => {
-    const mSoll = stats.kal.filter(r=>r.zaehlt && new Date(r.date).getMonth()===mi).length * user.hoursPerSession;
-    const mIst  = user.log.filter(l=>new Date(l.date).getMonth()===mi).reduce((s,l)=>s+l.hours,0);
+    const mSoll = stats.kal.filter(r=>r.zaehlt && monthIndexFromISO(r.date)===mi).length * user.hoursPerSession;
+    const mIst  = user.log.filter(l=>monthIndexFromISO(l.date)===mi).reduce((s,l)=>s+l.hours,0);
     const mDiff = mIst - mSoll;
-    const ferienInMonth = stats.kal.some(r=>r.ferienName && new Date(r.date).getMonth()===mi);
+    const ferienInMonth = stats.kal.some(r=>r.ferienName && monthIndexFromISO(r.date)===mi);
     const diffColor = mDiff >= 0 ? 'var(--green)' : mSoll===0 ? 'var(--text3)' : 'var(--red)';
     return `
       <div class="month-card">
@@ -475,19 +479,19 @@ function renderKalender(user, stats) {
     const startWd = firstDay.getDay() === 0 ? 6 : firstDay.getDay() - 1;
     const daysInMonth = new Date(YEAR, mi+1, 0).getDate();
     const dayMap = {};
-    kal.filter(r => new Date(r.date).getMonth() === mi).forEach(r => {
+    kal.filter(r => monthIndexFromISO(r.date) === mi).forEach(r => {
       const day = parseInt(r.date.slice(8));
       if (r.ferienName)           dayMap[day] = {type:'ferien', label:r.ferienName.split('/')[0].split(' ')[0]};
       else if (r.date > todayStr) dayMap[day] = {type:'future'};
       else if (logDates.has(r.date)) dayMap[day] = {type:'done'};
       else                        dayMap[day] = {type:'missed'};
     });
-    const mSoll   = kal.filter(r=>r.zaehlt && new Date(r.date).getMonth()===mi).length * user.hoursPerSession;
-    const mIst    = user.log.filter(l=>new Date(l.date).getMonth()===mi).reduce((s,l)=>s+l.hours,0);
-    const mDone   = kal.filter(r=>r.zaehlt && r.date<=todayStr && logDates.has(r.date) && new Date(r.date).getMonth()===mi).length;
-    const mMissed = kal.filter(r=>r.zaehlt && r.date<todayStr && !logDates.has(r.date) && new Date(r.date).getMonth()===mi).length;
-    const mFuture = kal.filter(r=>r.zaehlt && r.date>todayStr && new Date(r.date).getMonth()===mi).length;
-    const hasFer  = kal.some(r=>r.ferienName && new Date(r.date).getMonth()===mi);
+    const mSoll   = kal.filter(r=>r.zaehlt && monthIndexFromISO(r.date)===mi).length * user.hoursPerSession;
+    const mIst    = user.log.filter(l=>monthIndexFromISO(l.date)===mi).reduce((s,l)=>s+l.hours,0);
+    const mDone   = kal.filter(r=>r.zaehlt && r.date<=todayStr && logDates.has(r.date) && monthIndexFromISO(r.date)===mi).length;
+    const mMissed = kal.filter(r=>r.zaehlt && r.date<todayStr && !logDates.has(r.date) && monthIndexFromISO(r.date)===mi).length;
+    const mFuture = kal.filter(r=>r.zaehlt && r.date>todayStr && monthIndexFromISO(r.date)===mi).length;
+    const hasFer  = kal.some(r=>r.ferienName && monthIndexFromISO(r.date)===mi);
     const WD_LABELS = ['Mo','Di','Mi','Do','Fr','Sa','So'];
     const headers = WD_LABELS.map(d=>`<div style="font-size:10px;font-family:var(--mono);color:var(--text3);text-align:center;padding:2px 0;font-weight:500">${d}</div>`).join('');
     let cells = '';
@@ -764,7 +768,10 @@ function addLog(userId) {
   const gruppe = document.getElementById('lf_gruppe').value;
   const halle  = document.getElementById('lf_halle').value.trim();
   const hours  = parseFloat(document.getElementById('lf_hours').value);
-  if (!date || !gruppe || !hours) return;
+  if (!date || !gruppe || !Number.isFinite(hours) || hours <= 0) {
+    showToast('Bitte gueltige Stunden > 0 eintragen');
+    return;
+  }
   user.log.push({ id:'l'+Date.now(), date, gruppe, halle, hours });
   saveState(); renderAll();
 }
