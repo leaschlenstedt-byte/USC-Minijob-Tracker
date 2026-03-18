@@ -1,0 +1,833 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Trainings Tracker</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,300&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0f1117;
+  --bg2: #161b27;
+  --bg3: #1e2535;
+  --border: rgba(255,255,255,0.08);
+  --border2: rgba(255,255,255,0.15);
+  --text: #e8eaf0;
+  --text2: #8892a4;
+  --text3: #4a5568;
+  --accent: #4f9cf9;
+  --accent2: #3b82f6;
+  --green: #34d399;
+  --green-bg: rgba(52,211,153,0.1);
+  --red: #f87171;
+  --red-bg: rgba(248,113,113,0.1);
+  --amber: #fbbf24;
+  --amber-bg: rgba(251,191,36,0.1);
+  --mono: 'DM Mono', monospace;
+  --sans: 'DM Sans', sans-serif;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: 15px; }
+body { background: var(--bg); color: var(--text); font-family: var(--sans); min-height: 100vh; }
+.app { display: grid; grid-template-columns: 260px 1fr; min-height: 100vh; }
+.sidebar { background: var(--bg2); border-right: 1px solid var(--border); padding: 24px 0; position: sticky; top: 0; height: 100vh; overflow-y: auto; display: flex; flex-direction: column; }
+.main { padding: 32px; overflow-x: hidden; }
+.logo { padding: 0 24px 24px; border-bottom: 1px solid var(--border); margin-bottom: 8px; }
+.logo h1 { font-family: var(--mono); font-size: 13px; font-weight: 500; color: var(--accent); letter-spacing: 0.05em; text-transform: uppercase; }
+.logo p { font-size: 11px; color: var(--text3); margin-top: 4px; font-family: var(--mono); }
+.user-list { padding: 8px 12px; flex: 1; }
+.user-btn { width: 100%; text-align: left; background: none; border: none; cursor: pointer; padding: 10px 12px; border-radius: 8px; transition: background 0.15s; display: flex; align-items: center; gap: 10px; margin-bottom: 2px; }
+.user-btn:hover { background: var(--bg3); }
+.user-btn.active { background: rgba(79,156,249,0.12); }
+.user-avatar { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 600; font-family: var(--mono); flex-shrink: 0; }
+.user-info { flex: 1; min-width: 0; }
+.user-name { font-size: 13px; font-weight: 500; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.user-meta { font-size: 11px; color: var(--text3); font-family: var(--mono); }
+.user-status { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+.sidebar-actions { padding: 12px; border-top: 1px solid var(--border); }
+.btn-add-user { width: 100%; background: none; border: 1px dashed var(--border2); color: var(--text2); border-radius: 8px; padding: 10px; font-size: 13px; cursor: pointer; font-family: var(--sans); transition: all 0.15s; }
+.btn-add-user:hover { border-color: var(--accent); color: var(--accent); background: rgba(79,156,249,0.05); }
+.tabs { display: flex; gap: 2px; background: var(--bg2); border-radius: 10px; padding: 3px; margin-bottom: 28px; width: fit-content; }
+.tab { padding: 7px 18px; border-radius: 8px; border: none; background: none; color: var(--text2); font-size: 13px; font-family: var(--sans); cursor: pointer; transition: all 0.15s; font-weight: 500; }
+.tab.active { background: var(--bg3); color: var(--text); }
+.tab:hover:not(.active) { color: var(--text); }
+.kpi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 28px; }
+.kpi { background: var(--bg2); border: 1px solid var(--border); border-radius: 12px; padding: 18px 20px; }
+.kpi-label { font-size: 11px; color: var(--text3); font-family: var(--mono); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 8px; }
+.kpi-value { font-size: 28px; font-family: var(--mono); font-weight: 500; line-height: 1; }
+.kpi-sub { font-size: 11px; color: var(--text2); margin-top: 6px; }
+.kpi.green { border-color: rgba(52,211,153,0.2); }
+.kpi.green .kpi-value { color: var(--green); }
+.kpi.red { border-color: rgba(248,113,113,0.2); }
+.kpi.red .kpi-value { color: var(--red); }
+.kpi.amber { border-color: rgba(251,191,36,0.2); }
+.kpi.amber .kpi-value { color: var(--amber); }
+.kpi.blue { border-color: rgba(79,156,249,0.2); }
+.kpi.blue .kpi-value { color: var(--accent); }
+.progress-wrap { background: var(--bg2); border: 1px solid var(--border); border-radius: 12px; padding: 18px 20px; margin-bottom: 28px; }
+.progress-label { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+.progress-label span { font-size: 12px; color: var(--text2); font-family: var(--mono); }
+.progress-bar-bg { height: 6px; background: var(--bg3); border-radius: 3px; overflow: hidden; }
+.progress-bar-fill { height: 100%; border-radius: 3px; transition: width 0.6s cubic-bezier(0.4,0,0.2,1); background: linear-gradient(90deg, var(--accent2), var(--accent)); }
+.progress-markers { display: flex; justify-content: space-between; margin-top: 6px; }
+.progress-markers span { font-size: 10px; color: var(--text3); font-family: var(--mono); }
+.section-title { font-size: 12px; color: var(--text3); font-family: var(--mono); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 14px; display: flex; align-items: center; gap: 8px; }
+.section-title::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+.month-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+.month-card { background: var(--bg2); border: 1px solid var(--border); border-radius: 10px; padding: 14px; }
+.month-name { font-size: 11px; font-family: var(--mono); color: var(--text3); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
+.month-badge { font-size: 10px; padding: 2px 6px; border-radius: 4px; background: var(--amber-bg); color: var(--amber); }
+.month-stats { display: flex; gap: 8px; margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border); }
+.month-stat { flex: 1; text-align: center; }
+.month-stat-val { font-size: 14px; font-family: var(--mono); font-weight: 500; }
+.month-stat-lbl { font-size: 9px; color: var(--text3); text-transform: uppercase; letter-spacing: 0.05em; }
+.log-table { width: 100%; border-collapse: collapse; }
+.log-table th { text-align: left; padding: 8px 14px; font-size: 11px; font-family: var(--mono); color: var(--text3); text-transform: uppercase; letter-spacing: 0.06em; border-bottom: 1px solid var(--border); font-weight: 400; }
+.log-table td { padding: 10px 14px; font-size: 13px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+.log-table tr:last-child td { border-bottom: none; }
+.log-table tr:hover td { background: rgba(255,255,255,0.02); }
+.badge { display: inline-flex; align-items: center; padding: 3px 8px; border-radius: 4px; font-size: 11px; font-family: var(--mono); font-weight: 500; }
+.badge.lgnk { background: rgba(79,156,249,0.12); color: var(--accent); }
+.badge.lgusk { background: rgba(52,211,153,0.12); color: var(--green); }
+.badge.other { background: var(--bg3); color: var(--text2); }
+.btn-del { background: none; border: none; color: var(--text3); cursor: pointer; font-size: 16px; padding: 2px 6px; border-radius: 4px; transition: all 0.15s; }
+.btn-del:hover { background: var(--red-bg); color: var(--red); }
+.log-form { background: var(--bg2); border: 1px solid var(--border); border-radius: 12px; padding: 20px; margin-bottom: 20px; }
+.form-row { display: grid; grid-template-columns: 1fr 1fr 1fr auto; gap: 12px; align-items: end; }
+.form-group { display: flex; flex-direction: column; gap: 6px; }
+.form-group label { font-size: 11px; color: var(--text3); font-family: var(--mono); text-transform: uppercase; letter-spacing: 0.05em; }
+.form-group input, .form-group select { background: var(--bg3); border: 1px solid var(--border2); border-radius: 8px; padding: 9px 12px; color: var(--text); font-size: 13px; font-family: var(--sans); outline: none; transition: border-color 0.15s; width: 100%; }
+.form-group input:focus, .form-group select:focus { border-color: var(--accent); }
+.form-group select option { background: var(--bg3); }
+.btn-primary { background: var(--accent2); color: white; border: none; border-radius: 8px; padding: 9px 20px; font-size: 13px; font-family: var(--sans); font-weight: 500; cursor: pointer; transition: all 0.15s; white-space: nowrap; height: 38px; }
+.btn-primary:hover { background: var(--accent); transform: translateY(-1px); }
+.btn-primary:active { transform: translateY(0); }
+.setup-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.setup-card { background: var(--bg2); border: 1px solid var(--border); border-radius: 12px; padding: 22px; }
+.setup-card h3 { font-size: 13px; font-weight: 600; margin-bottom: 16px; color: var(--text); display: flex; align-items: center; gap: 8px; }
+.setup-card h3 span { font-size: 16px; }
+.form-group-inline { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.day-toggles { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 4px; }
+.day-toggle { position: relative; }
+.day-toggle input { position: absolute; opacity: 0; width: 0; }
+.day-toggle label { display: flex; align-items: center; justify-content: center; width: 36px; height: 36px; border-radius: 8px; border: 1px solid var(--border2); background: var(--bg3); color: var(--text2); font-size: 12px; font-family: var(--mono); cursor: pointer; transition: all 0.15s; }
+.day-toggle input:checked + label { background: rgba(79,156,249,0.15); border-color: var(--accent); color: var(--accent); }
+.ferien-list { display: flex; flex-direction: column; gap: 8px; max-height: 280px; overflow-y: auto; }
+.ferien-item { display: flex; align-items: center; gap: 8px; }
+.ferien-item input[type=text] { flex: 1.2; font-size: 12px; }
+.ferien-item input[type=date] { flex: 1; font-size: 12px; }
+.ferien-item input[type=date]::-webkit-calendar-picker-indicator { filter: invert(0.5); }
+.btn-icon { background: none; border: 1px solid var(--border); border-radius: 6px; color: var(--text3); cursor: pointer; padding: 6px 8px; font-size: 14px; transition: all 0.15s; }
+.btn-icon:hover { border-color: var(--red); color: var(--red); }
+.btn-add-ferien { background: none; border: 1px dashed var(--border2); color: var(--text2); border-radius: 8px; padding: 8px; font-size: 12px; cursor: pointer; font-family: var(--sans); transition: all 0.15s; width: 100%; margin-top: 6px; }
+.btn-add-ferien:hover { border-color: var(--accent); color: var(--accent); }
+.setup-actions { display: flex; gap: 10px; margin-top: 20px; justify-content: flex-end; }
+.btn-secondary { background: var(--bg3); border: 1px solid var(--border2); color: var(--text); border-radius: 8px; padding: 9px 20px; font-size: 13px; font-family: var(--sans); cursor: pointer; transition: all 0.15s; }
+.btn-secondary:hover { border-color: var(--accent); color: var(--accent); }
+.modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); display: flex; align-items: center; justify-content: center; z-index: 100; backdrop-filter: blur(4px); opacity: 0; pointer-events: none; transition: opacity 0.2s; }
+.modal-overlay.open { opacity: 1; pointer-events: all; }
+.modal { background: var(--bg2); border: 1px solid var(--border2); border-radius: 16px; padding: 28px; width: 480px; max-width: 90vw; }
+.modal h2 { font-size: 18px; font-weight: 600; margin-bottom: 20px; }
+.modal .form-group { margin-bottom: 14px; }
+.modal-actions { display: flex; gap: 10px; margin-top: 20px; justify-content: flex-end; }
+.empty { text-align: center; padding: 60px 20px; color: var(--text3); }
+.empty p { font-size: 14px; margin-top: 8px; }
+.no-user { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 60vh; color: var(--text3); gap: 12px; }
+.no-user h2 { font-size: 24px; font-family: var(--mono); color: var(--text2); }
+/* Toast notification */
+.toast { position: fixed; bottom: 28px; right: 28px; background: var(--bg3); border: 1px solid rgba(52,211,153,0.4); color: var(--green); font-family: var(--mono); font-size: 13px; padding: 10px 20px; border-radius: 10px; z-index: 200; opacity: 0; transform: translateY(8px); transition: opacity 0.25s, transform 0.25s; pointer-events: none; }
+.toast.show { opacity: 1; transform: translateY(0); }
+[data-tip] { position: relative; }
+[data-tip]:hover::after { content: attr(data-tip); position: absolute; bottom: calc(100% + 6px); left: 50%; transform: translateX(-50%); background: var(--bg3); border: 1px solid var(--border2); color: var(--text); font-size: 11px; padding: 4px 8px; border-radius: 6px; white-space: nowrap; z-index: 10; font-family: var(--mono); pointer-events: none; }
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--bg3); border-radius: 3px; }
+@media (max-width: 900px) {
+  .app { grid-template-columns: 1fr; }
+  .sidebar { position: static; height: auto; }
+  .kpi-grid { grid-template-columns: repeat(2,1fr); }
+  .month-grid { grid-template-columns: repeat(2,1fr); }
+  .setup-grid { grid-template-columns: 1fr; }
+  .form-row { grid-template-columns: 1fr 1fr; }
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar">
+    <div class="logo">
+      <h1>Training Tracker</h1>
+      <p>2026 · Bayern</p>
+    </div>
+    <div class="user-list" id="userList"></div>
+    <div class="sidebar-actions">
+      <button class="btn-add-user" onclick="openNewUserModal()">+ Neue Person hinzufügen</button>
+      <button class="btn-add-user" style="margin-top:6px;border-color:rgba(248,113,113,.3);color:#f87171" onclick="resetApp()">↺ App zurücksetzen</button>
+    </div>
+  </aside>
+  <main class="main" id="mainContent">
+    <div class="no-user">
+      <h2>← Person auswählen</h2>
+      <p>Wähle links eine Person oder füge eine neue hinzu.</p>
+    </div>
+  </main>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<!-- New User Modal -->
+<div class="modal-overlay" id="newUserModal">
+  <div class="modal">
+    <h2>Neue Person anlegen</h2>
+    <div class="form-group">
+      <label>Name</label>
+      <input type="text" id="nu_name" placeholder="z.B. Max Mustermann">
+    </div>
+    <div class="form-group">
+      <label>Jahreskontingent (Stunden)</label>
+      <input type="number" id="nu_kontingent" value="320" min="1">
+    </div>
+    <div class="form-group">
+      <label>Stunden pro Session</label>
+      <input type="number" id="nu_hours" value="3" min="1" max="12" step="0.5">
+    </div>
+    <div class="form-group">
+      <label>Trainingstage</label>
+      <div class="day-toggles" id="nu_days">
+        <div class="day-toggle"><input type="checkbox" id="d0" value="0"><label for="d0">Mo</label></div>
+        <div class="day-toggle"><input type="checkbox" id="d1" value="1"><label for="d1">Di</label></div>
+        <div class="day-toggle"><input type="checkbox" id="d2" value="2"><label for="d2">Mi</label></div>
+        <div class="day-toggle"><input type="checkbox" id="d3" value="3"><label for="d3">Do</label></div>
+        <div class="day-toggle"><input type="checkbox" id="d4" value="4"><label for="d4">Fr</label></div>
+        <div class="day-toggle"><input type="checkbox" id="d5" value="5"><label for="d5">Sa</label></div>
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Gruppe / Kürzel</label>
+      <input type="text" id="nu_gruppe" placeholder="z.B. LGNK, LGUSCKade">
+    </div>
+    <div class="modal-actions">
+      <button class="btn-secondary" onclick="closeModal('newUserModal')">Abbrechen</button>
+      <button class="btn-primary" onclick="createUser()">Anlegen</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── State ─────────────────────────────────────────────────────────────────────
+const STORAGE_KEY = 'trainings_tracker_v1';
+const YEAR = 2026;
+const AVATARS = ['#4f9cf9','#34d399','#f87171','#fbbf24','#a78bfa','#fb923c','#e879f9','#2dd4bf'];
+const WEEKDAYS = ['Mo','Di','Mi','Do','Fr','Sa','So'];
+const DEFAULT_FERIEN = [
+  {name:'Weihnachtsferien/Neujahr', start:'2026-01-01', end:'2026-01-06'},
+  {name:'Frühjahrsferien',          start:'2026-02-16', end:'2026-02-20'},
+  {name:'Osterferien',              start:'2026-03-30', end:'2026-04-10'},
+  {name:'Pfingstferien',            start:'2026-05-26', end:'2026-06-05'},
+  {name:'Sommerferien',             start:'2026-08-03', end:'2026-09-14'},
+  {name:'Herbstferien',             start:'2026-11-02', end:'2026-11-06'},
+  {name:'Weihnachtsferien',         start:'2026-12-24', end:'2026-12-31'},
+  {name:'Heilige Drei Könige',      start:'2026-01-06', end:'2026-01-06'},
+  {name:'Karfreitag',               start:'2026-04-03', end:'2026-04-03'},
+  {name:'Ostermontag',              start:'2026-04-06', end:'2026-04-06'},
+  {name:'Maifeiertag',              start:'2026-05-01', end:'2026-05-01'},
+  {name:'Pfingstmontag',            start:'2026-05-25', end:'2026-05-25'},
+  {name:'1. Weihnachtstag',         start:'2026-12-25', end:'2026-12-25'},
+];
+let state = { users: [], activeUserId: null };
+let currentTab = 'dashboard';
+
+// ── Toast ─────────────────────────────────────────────────────────────────────
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2200);
+}
+
+// ── Storage ───────────────────────────────────────────────────────────────────
+function loadState() {
+  try {
+    const s = localStorage.getItem(STORAGE_KEY);
+    if (s) state = JSON.parse(s);
+  } catch(e) {}
+}
+
+// FIX 1: saveState is now wrapped in try-catch so a storage error never
+// crashes the calling function and blocks the UI from updating.
+function saveState() {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  } catch(e) {
+    console.warn('localStorage nicht verfügbar:', e);
+  }
+}
+
+// ── Seed data ─────────────────────────────────────────────────────────────────
+function seedDefaultUser() {
+  if (state.users.length > 0) return;
+  const user = {
+    id: 'user_1',
+    name: 'Mein Profil',
+    gruppe: 'LGNK + LGUSCKade',
+    trainGroups: ['LGNK','LGUSCKade'],
+    kontingent: 320,
+    hoursPerSession: 3,
+    trainDays: [0,1,4],
+    color: AVATARS[0],
+    ferien: JSON.parse(JSON.stringify(DEFAULT_FERIEN)),
+    log: [
+      {id:'l1',  date:'2026-01-09', gruppe:'LGNK',      halle:'Element',         hours:3},
+      {id:'l2',  date:'2026-01-12', gruppe:'LGUSCKade', halle:'Element',         hours:3},
+      {id:'l3',  date:'2026-01-13', gruppe:'LGNK',      halle:'Element',         hours:3},
+      {id:'l4',  date:'2026-01-16', gruppe:'LGNK',      halle:'Element',         hours:3},
+      {id:'l5',  date:'2026-01-20', gruppe:'LGNK',      halle:'Element',         hours:3},
+      {id:'l6',  date:'2026-01-23', gruppe:'LGNK',      halle:'Element',         hours:3},
+      {id:'l7',  date:'2026-01-26', gruppe:'LGUSCKade', halle:'Element',         hours:3},
+      {id:'l8',  date:'2026-01-27', gruppe:'LGNK',      halle:'Element',         hours:3},
+      {id:'l9',  date:'2026-01-30', gruppe:'LGNK',      halle:'Element',         hours:3},
+      {id:'l10', date:'2026-02-02', gruppe:'LGUSCKade', halle:'Boulderwelt Ost', hours:3},
+      {id:'l11', date:'2026-02-03', gruppe:'LGNK',      halle:'Element',         hours:3},
+      {id:'l12', date:'2026-02-09', gruppe:'LGUSCKade', halle:'Element',         hours:3},
+      {id:'l13', date:'2026-02-10', gruppe:'LGNK',      halle:'Element',         hours:3},
+      {id:'l14', date:'2026-02-13', gruppe:'LGNK',      halle:'Element',         hours:3},
+      {id:'l15', date:'2026-02-24', gruppe:'LGNK',      halle:'Element',         hours:3},
+      {id:'l16', date:'2026-02-27', gruppe:'LGNK',      halle:'Element',         hours:3},
+      {id:'l17', date:'2026-03-02', gruppe:'LGUSCKade', halle:'Freimann',        hours:3},
+      {id:'l18', date:'2026-03-03', gruppe:'LGNK',      halle:'Thalkirchen',     hours:3},
+      {id:'l19', date:'2026-03-06', gruppe:'LGNK',      halle:'Freimann',        hours:3},
+      {id:'l20', date:'2026-03-09', gruppe:'LGUSCKade', halle:'Freimann',        hours:3},
+      {id:'l21', date:'2026-03-10', gruppe:'LGNK',      halle:'Thalkirchen',     hours:3},
+      {id:'l22', date:'2026-03-12', gruppe:'LGNK',      halle:'Thalkirchen',     hours:3},
+      {id:'l23', date:'2026-03-16', gruppe:'LGUSCKade', halle:'Freimann',        hours:3},
+      {id:'l24', date:'2026-03-17', gruppe:'LGNK',      halle:'Thalkirchen',     hours:3},
+    ]
+  };
+  state.users.push(user);
+  state.activeUserId = user.id;
+  saveState();
+}
+
+// ── Date helpers ──────────────────────────────────────────────────────────────
+function toISO(d) {
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+}
+function isFerien(dateStr, ferien) {
+  for (const f of ferien) {
+    if (dateStr >= f.start && dateStr <= f.end) return f.name;
+  }
+  return null;
+}
+function addDays(d, n) { const r = new Date(d); r.setDate(r.getDate()+n); return r; }
+function today() { return toISO(new Date()); }
+
+// ── Compute Soll-Kalender ─────────────────────────────────────────────────────
+function computeKalender(user) {
+  const rows = [];
+  let d = new Date(YEAR, 0, 1);
+  const end = new Date(YEAR, 11, 31);
+  let kum = 0;
+  while (d <= end) {
+    const dow = d.getDay();
+    const wd = dow === 0 ? 6 : dow - 1;
+    if (user.trainDays.includes(wd)) {
+      const ds = toISO(d);
+      const ferienName = isFerien(ds, user.ferien);
+      const zaehlt = !ferienName;
+      if (zaehlt) kum += user.hoursPerSession;
+      rows.push({ date: ds, wd, zaehlt, ferienName, kum });
+    }
+    d = addDays(d, 1);
+  }
+  return rows;
+}
+function computeStats(user) {
+  const kal = computeKalender(user);
+  const todayStr = today();
+  const logDates = new Set(user.log.map(l => l.date));
+  const istTotal = user.log.reduce((s,l) => s+l.hours, 0);
+  const totalSoll = kal.filter(r=>r.zaehlt).reduce((s,r)=>s+user.hoursPerSession, 0) || 0;
+  const puffer = totalSoll - user.kontingent;
+  const sollHeute = kal.filter(r=>r.zaehlt && r.date <= todayStr).reduce((s,r)=>s+user.hoursPerSession, 0);
+  const missed = kal.filter(r=>r.zaehlt && r.date < todayStr && !logDates.has(r.date));
+  const diff = istTotal - sollHeute;
+  const pufferRest = puffer + diff;
+  return { kal, istTotal, totalSoll, sollHeute, diff, puffer, pufferRest, missed, logDates };
+}
+
+// ── Render sidebar ────────────────────────────────────────────────────────────
+function renderSidebar() {
+  const ul = document.getElementById('userList');
+  ul.innerHTML = '';
+  state.users.forEach(u => {
+    const stats = computeStats(u);
+    const pct = Math.round(stats.istTotal / u.kontingent * 100);
+    const isActive = u.id === state.activeUserId;
+    const initials = u.name.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);
+    const btn = document.createElement('button');
+    btn.className = 'user-btn' + (isActive ? ' active' : '');
+    btn.innerHTML = `
+      <div class="user-avatar" style="background:${u.color}22;color:${u.color}">${initials}</div>
+      <div class="user-info">
+        <div class="user-name">${u.name}</div>
+        <div class="user-meta">${stats.istTotal}h / ${u.kontingent}h · ${pct}%</div>
+      </div>
+      <div class="user-status" style="background:${stats.diff >= 0 ? 'var(--green)' : 'var(--red)'}"></div>
+    `;
+    btn.onclick = () => { state.activeUserId = u.id; renderAll(); };
+    ul.appendChild(btn);
+  });
+}
+
+// ── Render main ───────────────────────────────────────────────────────────────
+function renderAll() {
+  renderSidebar();
+  const user = state.users.find(u => u.id === state.activeUserId);
+  const main = document.getElementById('mainContent');
+  if (!user) {
+    main.innerHTML = `<div class="no-user"><h2>← Person auswählen</h2><p>Wähle links eine Person oder füge eine neue hinzu.</p></div>`;
+    return;
+  }
+  main.innerHTML = `
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px">
+      <div>
+        <h2 style="font-size:22px;font-weight:600">${user.name}</h2>
+        <p style="color:var(--text3);font-size:13px;font-family:var(--mono);margin-top:3px">${user.gruppe || ''} · ${user.kontingent}h Jahreskontingent · ${user.trainDays.map(d=>WEEKDAYS[d]).join(', ')}</p>
+      </div>
+      <div style="display:flex;gap:8px">
+        <button class="btn-secondary" onclick="renderSetup('${user.id}')">⚙ Einstellungen</button>
+      </div>
+    </div>
+    <div class="tabs">
+      <button class="tab ${currentTab==='dashboard'?'active':''}" onclick="switchTab('dashboard')">Dashboard</button>
+      <button class="tab ${currentTab==='kalender'?'active':''}" onclick="switchTab('kalender')">Soll-Kalender</button>
+      <button class="tab ${currentTab==='log'?'active':''}" onclick="switchTab('log')">Trainingslog</button>
+    </div>
+    <div id="tabContent"></div>
+  `;
+  renderTab(user);
+}
+function switchTab(tab) { currentTab = tab; renderAll(); }
+function renderTab(user) {
+  const stats = computeStats(user);
+  if (currentTab === 'dashboard') renderDashboard(user, stats);
+  else if (currentTab === 'kalender') renderKalender(user, stats);
+  else renderLog(user, stats);
+}
+
+// ── Dashboard ─────────────────────────────────────────────────────────────────
+function renderDashboard(user, stats) {
+  const {istTotal, totalSoll, sollHeute, diff, puffer, pufferRest, missed} = stats;
+  const pct = Math.min(100, Math.round(istTotal / user.kontingent * 100));
+  const diffClass = diff >= 0 ? 'green' : 'red';
+  const diffSign = diff >= 0 ? '+' : '';
+  const pufferClass = pufferRest > 10 ? 'amber' : 'red';
+  const months = ['Jan','Feb','Mär','Apr','Mai','Jun','Jul','Aug','Sep','Okt','Nov','Dez'];
+  const monthCards = months.map((mn, mi) => {
+    const mSoll = stats.kal.filter(r=>r.zaehlt && new Date(r.date).getMonth()===mi).length * user.hoursPerSession;
+    const mIst  = user.log.filter(l=>new Date(l.date).getMonth()===mi).reduce((s,l)=>s+l.hours,0);
+    const mDiff = mIst - mSoll;
+    const ferienInMonth = stats.kal.some(r=>r.ferienName && new Date(r.date).getMonth()===mi);
+    const diffColor = mDiff >= 0 ? 'var(--green)' : mSoll===0 ? 'var(--text3)' : 'var(--red)';
+    return `
+      <div class="month-card">
+        <div class="month-name">${mn} ${ferienInMonth?'<span class="month-badge">Ferien</span>':''}</div>
+        <div class="month-stats">
+          <div class="month-stat"><div class="month-stat-val" style="color:var(--accent)">${mSoll}h</div><div class="month-stat-lbl">Soll</div></div>
+          <div class="month-stat"><div class="month-stat-val">${mIst}h</div><div class="month-stat-lbl">Ist</div></div>
+          <div class="month-stat"><div class="month-stat-val" style="color:${diffColor}">${mSoll===0?'–':(mDiff>=0?'+':'')+mDiff+'h'}</div><div class="month-stat-lbl">Diff</div></div>
+        </div>
+      </div>`;
+  }).join('');
+  document.getElementById('tabContent').innerHTML = `
+    <div class="kpi-grid">
+      <div class="kpi blue"><div class="kpi-label">Soll bis heute</div><div class="kpi-value">${sollHeute}h</div><div class="kpi-sub">laut Soll-Kalender</div></div>
+      <div class="kpi"><div class="kpi-label">Geleistet</div><div class="kpi-value">${istTotal}h</div><div class="kpi-sub">von ${user.kontingent}h Ziel</div></div>
+      <div class="kpi ${diffClass}"><div class="kpi-label">Differenz</div><div class="kpi-value">${diffSign}${diff}h</div><div class="kpi-sub">${diff>=0?'du liegst vorne':'du liegst hinten'}</div></div>
+      <div class="kpi ${pufferClass}"><div class="kpi-label">Verbleibender Puffer</div><div class="kpi-value">${pufferRest}h</div><div class="kpi-sub">von ${puffer}h total · ${missed.length} Sessions ausgefallen</div></div>
+    </div>
+    <div class="progress-wrap">
+      <div class="progress-label">
+        <span>Jahresfortschritt: ${istTotal}h von ${user.kontingent}h Vertragsziel</span>
+        <span style="color:var(--accent)">${pct}%</span>
+      </div>
+      <div class="progress-bar-bg"><div class="progress-bar-fill" style="width:${pct}%"></div></div>
+      <div class="progress-markers">
+        <span>0h</span><span>${Math.round(user.kontingent*0.25)}h</span><span>${Math.round(user.kontingent*0.5)}h</span><span>${Math.round(user.kontingent*0.75)}h</span><span>${user.kontingent}h</span>
+      </div>
+    </div>
+    <p style="font-size:11px;color:var(--text3);font-family:var(--mono);margin-bottom:12px;text-transform:uppercase;letter-spacing:.06em">
+      Jahres-Soll: ${totalSoll}h · Vertragsziel: ${user.kontingent}h · Puffer: ${puffer}h
+    </p>
+    <div class="section-title">Monatsübersicht</div>
+    <div class="month-grid">${monthCards}</div>
+  `;
+}
+
+// ── Soll-Kalender ─────────────────────────────────────────────────────────────
+function renderKalender(user, stats) {
+  const {kal, logDates} = stats;
+  const todayStr = today();
+  const months = ['Januar','Februar','März','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember'];
+  const monthBlocks = months.map((mname, mi) => {
+    const firstDay = new Date(YEAR, mi, 1);
+    const startWd = firstDay.getDay() === 0 ? 6 : firstDay.getDay() - 1;
+    const daysInMonth = new Date(YEAR, mi+1, 0).getDate();
+    const dayMap = {};
+    kal.filter(r => new Date(r.date).getMonth() === mi).forEach(r => {
+      const day = parseInt(r.date.slice(8));
+      if (r.ferienName)           dayMap[day] = {type:'ferien', label:r.ferienName.split('/')[0].split(' ')[0]};
+      else if (r.date > todayStr) dayMap[day] = {type:'future'};
+      else if (logDates.has(r.date)) dayMap[day] = {type:'done'};
+      else                        dayMap[day] = {type:'missed'};
+    });
+    const mSoll   = kal.filter(r=>r.zaehlt && new Date(r.date).getMonth()===mi).length * user.hoursPerSession;
+    const mIst    = user.log.filter(l=>new Date(l.date).getMonth()===mi).reduce((s,l)=>s+l.hours,0);
+    const mDone   = kal.filter(r=>r.zaehlt && r.date<=todayStr && logDates.has(r.date) && new Date(r.date).getMonth()===mi).length;
+    const mMissed = kal.filter(r=>r.zaehlt && r.date<todayStr && !logDates.has(r.date) && new Date(r.date).getMonth()===mi).length;
+    const mFuture = kal.filter(r=>r.zaehlt && r.date>todayStr && new Date(r.date).getMonth()===mi).length;
+    const hasFer  = kal.some(r=>r.ferienName && new Date(r.date).getMonth()===mi);
+    const WD_LABELS = ['Mo','Di','Mi','Do','Fr','Sa','So'];
+    const headers = WD_LABELS.map(d=>`<div style="font-size:10px;font-family:var(--mono);color:var(--text3);text-align:center;padding:2px 0;font-weight:500">${d}</div>`).join('');
+    let cells = '';
+    for (let i=0; i<startWd; i++) cells += `<div></div>`;
+    for (let day=1; day<=daysInMonth; day++) {
+      const ds = `${YEAR}-${String(mi+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
+      const dow = new Date(YEAR, mi, day).getDay();
+      const wd  = dow === 0 ? 6 : dow - 1;
+      const isWeekend = wd >= 5;
+      const info = dayMap[day];
+      const isToday = ds === todayStr;
+      let bg='', color='', border='', fw='400';
+      if (isToday) border = 'box-shadow:inset 0 0 0 1.5px var(--accent)';
+      if (!info) { bg = isWeekend ? 'rgba(255,255,255,0.02)' : 'transparent'; color = 'var(--text3)'; }
+      else if (info.type==='ferien')  { bg='rgba(251,191,36,0.12)'; color='var(--amber)'; }
+      else if (info.type==='done')    { bg='rgba(52,211,153,0.12)'; color='var(--green)'; fw='600'; }
+      else if (info.type==='missed')  { bg='rgba(248,113,113,0.12)'; color='var(--red)'; fw='600'; }
+      else if (info.type==='future')  { bg='rgba(79,156,249,0.08)'; color='var(--accent)'; }
+      cells += `<div style="background:${bg};color:${color};font-weight:${fw};border-radius:5px;text-align:center;padding:4px 2px;font-size:12px;font-family:var(--mono);${border}" title="${info?.type==='done'?'✓ geleistet':info?.type==='missed'?'✗ ausgefallen':info?.type==='ferien'?info.label:info?.type==='future'?'ausstehend':''}">${day}</div>`;
+    }
+    const diffColor = mSoll===0?'var(--text3)':mIst>=mSoll?'var(--green)':'var(--red)';
+    const diffVal   = mSoll===0?'–':(mIst-mSoll>=0?'+':'')+(mIst-mSoll)+'h';
+    return `
+      <div style="background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:16px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+          <span style="font-size:13px;font-weight:600;color:var(--text)">${mname}</span>
+          <div style="display:flex;gap:10px;font-size:11px;font-family:var(--mono)">
+            ${mDone>0?`<span style="color:var(--green)">✓ ${mDone}</span>`:''}
+            ${mMissed>0?`<span style="color:var(--red)">✗ ${mMissed}</span>`:''}
+            ${mFuture>0?`<span style="color:var(--accent)">◦ ${mFuture}</span>`:''}
+            ${hasFer?`<span style="color:var(--amber)">⛱ Ferien</span>`:''}
+            <span style="color:var(--text3)">Soll ${mSoll}h</span>
+            <span style="color:${diffColor}">${diffVal}</span>
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:3px">${headers}${cells}</div>
+      </div>`;
+  }).join('');
+  document.getElementById('tabContent').innerHTML = `
+    <div style="display:flex;gap:16px;margin-bottom:18px;font-size:12px;color:var(--text2);align-items:center;font-family:var(--mono);flex-wrap:wrap">
+      <span><span style="display:inline-block;width:12px;height:12px;border-radius:2px;background:rgba(52,211,153,.12);border:1px solid rgba(52,211,153,.3);vertical-align:middle;margin-right:4px"></span>Geleistet</span>
+      <span><span style="display:inline-block;width:12px;height:12px;border-radius:2px;background:rgba(248,113,113,.12);border:1px solid rgba(248,113,113,.3);vertical-align:middle;margin-right:4px"></span>Ausgefallen</span>
+      <span><span style="display:inline-block;width:12px;height:12px;border-radius:2px;background:rgba(79,156,249,.08);border:1px solid rgba(79,156,249,.2);vertical-align:middle;margin-right:4px"></span>Ausstehend</span>
+      <span><span style="display:inline-block;width:12px;height:12px;border-radius:2px;background:rgba(251,191,36,.12);vertical-align:middle;margin-right:4px"></span>Ferien</span>
+      <span style="margin-left:auto;color:var(--text3)">Heute: <span style="color:var(--accent)">${todayStr}</span></span>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px">${monthBlocks}</div>
+  `;
+}
+
+// ── Trainingslog ──────────────────────────────────────────────────────────────
+function renderLog(user, stats) {
+  const sorted = [...user.log].sort((a,b)=>b.date.localeCompare(a.date));
+  const rows = sorted.map(l => {
+    const gc = l.gruppe==='LGNK'?'lgnk':l.gruppe==='LGUSCKade'?'lgusk':'other';
+    return `<tr>
+      <td style="font-family:var(--mono);color:var(--text2)">${l.date}</td>
+      <td><span class="badge ${gc}">${l.gruppe}</span></td>
+      <td>${l.halle||'–'}</td>
+      <td style="font-family:var(--mono);color:var(--accent)">${l.hours}h</td>
+      <td><button class="btn-del" onclick="deleteLog('${user.id}','${l.id}')" title="Löschen">×</button></td>
+    </tr>`;
+  }).join('') || `<tr><td colspan="5"><div class="empty"><p>Noch keine Einträge.</p></div></td></tr>`;
+  const groups = (user.trainGroups && user.trainGroups.length) ? user.trainGroups : ['LGNK','LGUSCKade'];
+  const gruppenOptions = [...new Set([...user.log.map(l=>l.gruppe),...groups])].map(g=>`<option>${g}</option>`).join('');
+  document.getElementById('tabContent').innerHTML = `
+    <div class="log-form">
+      <div class="form-row">
+        <div class="form-group"><label>Datum</label><input type="date" id="lf_date" value="${today()}"></div>
+        <div class="form-group"><label>Gruppe</label><select id="lf_gruppe">${gruppenOptions}</select></div>
+        <div class="form-group"><label>Kletterhalle</label><input type="text" id="lf_halle" placeholder="z.B. Element"></div>
+        <div class="form-group"><label>Stunden</label><input type="number" id="lf_hours" value="${user.hoursPerSession}" min="0.5" max="12" step="0.5" style="width:80px"></div>
+        <button class="btn-primary" onclick="addLog('${user.id}')">+ Eintragen</button>
+      </div>
+    </div>
+    <div style="background:var(--bg2);border:1px solid var(--border);border-radius:12px;overflow:hidden">
+      <table class="log-table">
+        <thead><tr><th>Datum</th><th>Gruppe</th><th>Halle</th><th>Stunden</th><th></th></tr></thead>
+        <tbody>${rows}</tbody>
+      </table>
+    </div>
+  `;
+}
+
+// ── Setup / Einstellungen ─────────────────────────────────────────────────────
+function renderSetup(userId) {
+  const user = state.users.find(u=>u.id===userId);
+  if (!user) return;
+  const main = document.getElementById('mainContent');
+  const dayToggles = WEEKDAYS.slice(0,6).map((wd,i) => `
+    <div class="day-toggle">
+      <input type="checkbox" id="sd${i}" value="${i}" ${user.trainDays.includes(i)?'checked':''}>
+      <label for="sd${i}">${wd}</label>
+    </div>`).join('');
+  const ferienItems = user.ferien.map((f,i) => `
+    <div class="ferien-item" id="fi_${i}">
+      <input type="text"  class="fi-name"  data-idx="${i}" value="${f.name}"  style="flex:1.2;font-size:12px">
+      <input type="date"  class="fi-start" data-idx="${i}" value="${f.start}" style="flex:1;font-size:12px">
+      <input type="date"  class="fi-end"   data-idx="${i}" value="${f.end}"   style="flex:1;font-size:12px">
+      <button class="btn-icon fi-del" data-idx="${i}">×</button>
+    </div>`).join('');
+  main.innerHTML = `
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:24px">
+      <button class="btn-secondary" onclick="renderAll()">← Zurück</button>
+      <h2 style="font-size:20px;font-weight:600">Einstellungen: ${user.name}</h2>
+    </div>
+    <div class="setup-grid">
+      <div class="setup-card">
+        <h3><span>👤</span> Profil</h3>
+        <div class="form-group" style="margin-bottom:14px">
+          <label>Name</label>
+          <input type="text" id="s_name" value="${user.name}">
+        </div>
+        <div class="form-group" style="margin-bottom:14px">
+          <label>Gruppe / Kürzel</label>
+          <input type="text" id="s_gruppe" value="${user.gruppe||''}">
+        </div>
+        <div class="form-group-inline" style="margin-bottom:14px">
+          <div class="form-group">
+            <label>Jahreskontingent (h)</label>
+            <input type="number" id="s_kontingent" value="${user.kontingent}" min="1">
+          </div>
+          <div class="form-group">
+            <label>Stunden pro Session</label>
+            <input type="number" id="s_hours" value="${user.hoursPerSession}" min="0.5" step="0.5">
+          </div>
+        </div>
+        <div class="form-group" style="margin-bottom:14px">
+          <label>Trainingstage</label>
+          <div class="day-toggles">${dayToggles}</div>
+        </div>
+        <div class="form-group">
+          <label>Farbe</label>
+          <div style="display:flex;gap:8px;margin-top:4px">
+            ${AVATARS.map(c=>`<div onclick="setColor('${userId}','${c}')" style="width:28px;height:28px;border-radius:50%;background:${c};cursor:pointer;border:2px solid ${c===user.color?'white':'transparent'};transition:border-color .15s"></div>`).join('')}
+          </div>
+        </div>
+      </div>
+      <div class="setup-card">
+        <h3><span>🏖</span> Schulferien</h3>
+        <div style="display:grid;grid-template-columns:1.2fr 1fr 1fr 32px;gap:6px;margin-bottom:6px">
+          <span style="font-size:10px;color:var(--text3);font-family:var(--mono);text-transform:uppercase;letter-spacing:.05em">Name</span>
+          <span style="font-size:10px;color:var(--text3);font-family:var(--mono);text-transform:uppercase;letter-spacing:.05em">Von</span>
+          <span style="font-size:10px;color:var(--text3);font-family:var(--mono);text-transform:uppercase;letter-spacing:.05em">Bis</span>
+          <span></span>
+        </div>
+        <div class="ferien-list" id="ferienList">${ferienItems}</div>
+        <button class="btn-add-ferien" onclick="addFerien('${userId}')">+ Ferienperiode hinzufügen</button>
+      </div>
+    </div>
+    <div class="setup-actions">
+      <button class="btn-secondary" style="color:var(--red);border-color:rgba(248,113,113,.3)" onclick="deleteUser('${userId}')">Person löschen</button>
+      <button class="btn-secondary" onclick="renderAll()">Abbrechen</button>
+      <button class="btn-primary" onclick="saveSetup('${userId}')">Speichern</button>
+    </div>
+  `;
+
+  // Attach ferien event listeners
+  const ferienList = document.getElementById('ferienList');
+  if (ferienList) {
+    ferienList.addEventListener('change', e => {
+      const el = e.target;
+      const idx = parseInt(el.dataset.idx);
+      if (isNaN(idx)) return;
+      const u = state.users.find(u2=>u2.id===userId);
+      if (!u || !u.ferien[idx]) return;
+      const val = el.value.trim();
+      if (!val) return;
+      if (el.classList.contains('fi-name'))  u.ferien[idx].name  = val;
+      if (el.classList.contains('fi-start')) { if (/^\d{4}-\d{2}-\d{2}$/.test(val)) u.ferien[idx].start = val; }
+      if (el.classList.contains('fi-end'))   { if (/^\d{4}-\d{2}-\d{2}$/.test(val)) u.ferien[idx].end   = val; }
+      saveState();
+    });
+    ferienList.addEventListener('click', e => {
+      const btn = e.target.closest('.fi-del');
+      if (!btn) return;
+      const idx = parseInt(btn.dataset.idx);
+      const u = state.users.find(u2=>u2.id===userId);
+      if (!u) return;
+      u.ferien.splice(idx, 1);
+      saveState();
+      renderSetup(userId);
+    });
+  }
+}
+
+function addFerien(userId) {
+  const user = state.users.find(u=>u.id===userId);
+  if (user) {
+    user.ferien.push({name:'Neue Ferien', start:today(), end:today()});
+    saveState();
+    renderSetup(userId);
+  }
+}
+function setColor(userId, color) {
+  const user = state.users.find(u=>u.id===userId);
+  if (user) { user.color = color; saveState(); renderSetup(userId); renderSidebar(); }
+}
+
+// ── saveSetup – FIXED ─────────────────────────────────────────────────────────
+// Fixes applied:
+//   1. saveState() is already wrapped (try-catch in saveState itself), so a
+//      storage failure can no longer crash this function before renderAll().
+//   2. All DOM reads use null checks – a missing element can no longer throw
+//      a TypeError that silently aborts the save.
+//   3. startEl / endEl in the ferien loop are now guarded (were missing before).
+//   4. trainGroups is derived from the gruppe field so the log dropdown stays
+//      in sync when groups are renamed.
+function saveSetup(userId) {
+  const user = state.users.find(u=>u.id===userId);
+  if (!user) return;
+
+  // Profile fields – safe null checks throughout
+  const nameEl   = document.getElementById('s_name');
+  const gruppeEl = document.getElementById('s_gruppe');
+  const kontEl   = document.getElementById('s_kontingent');
+  const hoursEl  = document.getElementById('s_hours');
+
+  if (nameEl   && nameEl.value.trim())   user.name            = nameEl.value.trim();
+  if (gruppeEl)                          user.gruppe          = gruppeEl.value.trim();
+  if (kontEl) {
+    const k = parseFloat(kontEl.value);
+    if (!isNaN(k) && k > 0)             user.kontingent      = k;
+  }
+  if (hoursEl) {
+    const h = parseFloat(hoursEl.value);
+    if (!isNaN(h) && h > 0)             user.hoursPerSession  = h;
+  }
+
+  // Keep trainGroups in sync with the gruppe display field
+  if (user.gruppe) {
+    const parsed = user.gruppe.split(/[,+]/).map(g => g.trim()).filter(g => g.length > 0);
+    if (parsed.length > 0) user.trainGroups = parsed;
+  }
+
+  // Training days
+  const checkboxes = document.querySelectorAll('#sd0,#sd1,#sd2,#sd3,#sd4,#sd5');
+  if (checkboxes.length > 0) {
+    user.trainDays = Array.from(checkboxes).filter(cb=>cb.checked).map(cb=>parseInt(cb.value));
+  }
+
+  // Ferien – FIX: guard startEl and endEl for null before accessing .value
+  document.querySelectorAll('#ferienList .ferien-item').forEach(row => {
+    const nameEl2 = row.querySelector('.fi-name');
+    const startEl = row.querySelector('.fi-start');
+    const endEl   = row.querySelector('.fi-end');
+    if (!nameEl2 || !startEl || !endEl) return;   // <-- was missing; caused TypeError crash
+    const idx = parseInt(nameEl2.dataset.idx);
+    if (isNaN(idx) || !user.ferien[idx]) return;
+    if (nameEl2.value.trim())                        user.ferien[idx].name  = nameEl2.value.trim();
+    if (/^\d{4}-\d{2}-\d{2}$/.test(startEl.value)) user.ferien[idx].start = startEl.value;
+    if (/^\d{4}-\d{2}-\d{2}$/.test(endEl.value))   user.ferien[idx].end   = endEl.value;
+  });
+
+  // saveState() no longer throws (try-catch inside), so renderAll() is always reached
+  saveState();
+  currentTab = 'kalender';
+  renderAll();
+  showToast('Einstellungen gespeichert');
+}
+
+function deleteUser(userId) {
+  if (!confirm('Person wirklich löschen?')) return;
+  state.users = state.users.filter(u=>u.id!==userId);
+  if (state.activeUserId===userId) state.activeUserId = state.users[0]?.id || null;
+  saveState(); renderAll();
+}
+
+// ── Log actions ───────────────────────────────────────────────────────────────
+function addLog(userId) {
+  const user = state.users.find(u=>u.id===userId);
+  if (!user) return;
+  const date   = document.getElementById('lf_date').value;
+  const gruppe = document.getElementById('lf_gruppe').value;
+  const halle  = document.getElementById('lf_halle').value.trim();
+  const hours  = parseFloat(document.getElementById('lf_hours').value);
+  if (!date || !gruppe || !hours) return;
+  user.log.push({ id:'l'+Date.now(), date, gruppe, halle, hours });
+  saveState(); renderAll();
+}
+function deleteLog(userId, logId) {
+  const user = state.users.find(u=>u.id===userId);
+  if (!user) return;
+  user.log = user.log.filter(l=>l.id!==logId);
+  saveState(); renderAll();
+}
+
+// ── New user modal ────────────────────────────────────────────────────────────
+function openNewUserModal() {
+  document.getElementById('nu_name').value = '';
+  document.getElementById('nu_kontingent').value = '320';
+  document.getElementById('nu_hours').value = '3';
+  document.getElementById('nu_gruppe').value = '';
+  document.querySelectorAll('#nu_days input').forEach(cb=>cb.checked=false);
+  document.getElementById('newUserModal').classList.add('open');
+}
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+function createUser() {
+  const name = document.getElementById('nu_name').value.trim();
+  if (!name) return;
+  const trainDays  = Array.from(document.querySelectorAll('#nu_days input')).filter(cb=>cb.checked).map(cb=>parseInt(cb.value));
+  const gruppeVal  = document.getElementById('nu_gruppe').value.trim();
+  const trainGroups = gruppeVal
+    ? gruppeVal.split(/[,+]/).map(g=>g.trim()).filter(g=>g.length>0)
+    : ['LGNK','LGUSCKade'];
+  const user = {
+    id: 'user_'+Date.now(),
+    name,
+    gruppe: gruppeVal,
+    kontingent: parseFloat(document.getElementById('nu_kontingent').value)||320,
+    hoursPerSession: parseFloat(document.getElementById('nu_hours').value)||3,
+    trainDays: trainDays.length ? trainDays : [0,1,4],
+    color: AVATARS[state.users.length % AVATARS.length],
+    trainGroups,
+    ferien: JSON.parse(JSON.stringify(DEFAULT_FERIEN)),
+    log: []
+  };
+  state.users.push(user);
+  state.activeUserId = user.id;
+  saveState();
+  closeModal('newUserModal');
+  renderAll();
+}
+document.getElementById('newUserModal').addEventListener('click', function(e) {
+  if (e.target === this) closeModal('newUserModal');
+});
+
+// ── Reset ─────────────────────────────────────────────────────────────────────
+function resetApp() {
+  if (!confirm('Alle Daten löschen und App zurücksetzen?')) return;
+  try { localStorage.removeItem(STORAGE_KEY); } catch(e) {}
+  state = { users: [], activeUserId: null };
+  seedDefaultUser();
+  renderAll();
+}
+
+// ── Init ──────────────────────────────────────────────────────────────────────
+loadState();
+seedDefaultUser();
+renderAll();
+</script>
+</body>
+</html>
