@@ -173,6 +173,11 @@ body { background: var(--bg); color: var(--text); font-family: var(--sans); min-
     <div class="user-list" id="userList"></div>
     <div class="sidebar-actions">
       <button class="btn-add-user" onclick="openNewUserModal()">+ Neue Person hinzufügen</button>
+      <button class="btn-add-user" style="margin-top:6px;border-color:rgba(79,156,249,.3);color:var(--accent)" onclick="exportData()">↓ Daten exportieren</button>
+      <label class="btn-add-user" style="margin-top:6px;border-color:rgba(79,156,249,.3);color:var(--accent);cursor:pointer;display:block;text-align:center">
+        ↑ Daten importieren
+        <input type="file" id="importFile" accept=".json" style="display:none" onchange="importData(this)">
+      </label>
       <button class="btn-add-user" style="margin-top:6px;border-color:rgba(248,113,113,.3);color:#f87171" onclick="resetApp()">↺ App zurücksetzen</button>
     </div>
   </aside>
@@ -200,19 +205,15 @@ body { background: var(--bg); color: var(--text); font-family: var(--sans); min-
       <input type="number" id="nu_kontingent" value="320" min="1">
     </div>
     <div class="form-group">
-      <label>Stunden pro Session</label>
-      <input type="number" id="nu_hours" value="3" min="1" max="12" step="0.5">
-    </div>
-    <div class="form-group">
-      <label>Trainingstage</label>
-      <div class="day-toggles" id="nu_days">
-        <div class="day-toggle"><input type="checkbox" id="d0" value="0"><label for="d0">Mo</label></div>
-        <div class="day-toggle"><input type="checkbox" id="d1" value="1"><label for="d1">Di</label></div>
-        <div class="day-toggle"><input type="checkbox" id="d2" value="2"><label for="d2">Mi</label></div>
-        <div class="day-toggle"><input type="checkbox" id="d3" value="3"><label for="d3">Do</label></div>
-        <div class="day-toggle"><input type="checkbox" id="d4" value="4"><label for="d4">Fr</label></div>
-        <div class="day-toggle"><input type="checkbox" id="d5" value="5"><label for="d5">Sa</label></div>
+      <label>Trainings mit Soll-Zeit</label>
+      <div style="display:grid;grid-template-columns:1.4fr 0.9fr 0.7fr 32px;gap:8px;margin-bottom:6px">
+        <span style="font-size:10px;color:var(--text3);font-family:var(--mono);text-transform:uppercase;letter-spacing:.05em">Training</span>
+        <span style="font-size:10px;color:var(--text3);font-family:var(--mono);text-transform:uppercase;letter-spacing:.05em">Tag</span>
+        <span style="font-size:10px;color:var(--text3);font-family:var(--mono);text-transform:uppercase;letter-spacing:.05em">Soll (h)</span>
+        <span></span>
       </div>
+      <div class="training-list" id="nu_training_list"></div>
+      <button type="button" class="btn-add-ferien" id="nuAddTrainingBtn" style="margin-top:8px" onclick="addNewUserTraining()">+ Training hinzufügen</button>
     </div>
     <div class="modal-actions">
       <button class="btn-secondary" onclick="closeModal('newUserModal')">Abbrechen</button>
@@ -255,6 +256,7 @@ const DEFAULT_FERIEN = [
 ];
 let state = { users: [], activeUserId: null };
 let currentTab = 'dashboard';
+let newUserTrainings = [];
 
 // ── Toast ─────────────────────────────────────────────────────────────────────
 function showToast(msg) {
@@ -282,6 +284,11 @@ function saveState() {
     console.warn('localStorage nicht verfügbar:', e);
     return false;
   }
+}
+function persistAndToast(successMsg, errorMsg) {
+  const ok = saveState();
+  showToast(ok ? successMsg : errorMsg);
+  return ok;
 }
 
 // ── Seed data ─────────────────────────────────────────────────────────────────
@@ -637,7 +644,7 @@ function renderSetup(userId) {
       <input type="text" class="tr-name" data-idx="${i}" value="${t.label}" placeholder="Trainingname">
       <select class="tr-day" data-idx="${i}">${WEEKDAYS.slice(0,6).map((wd, wdIdx)=>`<option value="${wdIdx}" ${wdIdx===t.wd?'selected':''}>${wd}</option>`).join('')}</select>
       <input type="number" class="tr-hours" data-idx="${i}" min="0.5" step="0.5" value="${t.sollHours}">
-      <button class="btn-icon" onclick="deleteTraining('${userId}',${i})">×</button>
+      <button type="button" class="btn-icon" onclick="deleteTraining('${userId}',${i})">×</button>
     </div>
   `).join('');
   const ferienItems = user.ferien.map((f,i) => `
@@ -674,7 +681,7 @@ function renderSetup(userId) {
             <span></span>
           </div>
           <div class="training-list" id="trainingList">${trainingItems}</div>
-          <button class="btn-add-ferien" style="margin-top:8px" onclick="addTraining('${userId}')">+ Training hinzufügen</button>
+          <button type="button" class="btn-add-ferien" style="margin-top:8px" onclick="addTraining('${userId}')">+ Training hinzufügen</button>
         </div>
         <div class="form-group">
           <label>Farbe</label>
@@ -735,7 +742,7 @@ function addFerien(userId) {
   const user = state.users.find(u=>u.id===userId);
   if (user) {
     user.ferien.push({name:'Neue Ferien', start:today(), end:today()});
-    saveState();
+    persistAndToast('Ferien gespeichert', 'Speichern fehlgeschlagen');
     renderSetup(userId);
   }
 }
@@ -749,7 +756,7 @@ function addTraining(userId) {
     wd: 0,
     sollHours: defaultLogHours(user)
   });
-  saveState();
+  persistAndToast('Training gespeichert', 'Speichern fehlgeschlagen');
   renderSetup(userId);
 }
 function deleteTraining(userId, idx) {
@@ -760,12 +767,12 @@ function deleteTraining(userId, idx) {
   if (trainings.length === 0) {
     trainings.push({ id: `tr_${Date.now()}`, label: 'Training', wd: 0, sollHours: 3 });
   }
-  saveState();
+  persistAndToast('Training aktualisiert', 'Speichern fehlgeschlagen');
   renderSetup(userId);
 }
 function setColor(userId, color) {
   const user = state.users.find(u=>u.id===userId);
-  if (user) { user.color = color; saveState(); renderSetup(userId); renderSidebar(); }
+  if (user) { user.color = color; persistAndToast('Farbe gespeichert', 'Speichern fehlgeschlagen'); renderSetup(userId); renderSidebar(); }
 }
 
 // ── saveSetup – FIXED ─────────────────────────────────────────────────────────
@@ -791,27 +798,36 @@ function saveSetup(userId) {
 
   // Trainings with per-session soll hours
   const trainRows = document.querySelectorAll('#trainingList .training-item');
-  if (trainRows.length > 0) {
-    const parsedTrainings = [];
-    trainRows.forEach((row, idx) => {
-      const nameEl2 = row.querySelector('.tr-name');
-      const dayEl = row.querySelector('.tr-day');
-      const hoursEl2 = row.querySelector('.tr-hours');
-      if (!nameEl2 || !dayEl || !hoursEl2) return;
-      const label = nameEl2.value.trim() || `Training ${idx+1}`;
-      const wd = parseInt(dayEl.value, 10);
-      const sh = parseFloat(hoursEl2.value);
-      if (!Number.isInteger(wd) || wd < 0 || wd > 5) return;
-      if (!Number.isFinite(sh) || sh <= 0) return;
-      parsedTrainings.push({
-        id: `tr_${idx}_${Date.now()}`,
-        label,
-        wd,
-        sollHours: sh
-      });
-    });
-    if (parsedTrainings.length > 0) user.trainings = parsedTrainings;
+  if (trainRows.length === 0) {
+    showToast('Mindestens ein Training erforderlich');
+    return;
   }
+  const parsedTrainings = [];
+  let invalidTraining = false;
+  trainRows.forEach((row, idx) => {
+    const nameEl2 = row.querySelector('.tr-name');
+    const dayEl = row.querySelector('.tr-day');
+    const hoursEl2 = row.querySelector('.tr-hours');
+    if (!nameEl2 || !dayEl || !hoursEl2) { invalidTraining = true; return; }
+    const label = nameEl2.value.trim() || `Training ${idx+1}`;
+    const wd = parseInt(dayEl.value, 10);
+    const sh = parseFloat(hoursEl2.value);
+    if (!Number.isInteger(wd) || wd < 0 || wd > 5 || !Number.isFinite(sh) || sh <= 0) {
+      invalidTraining = true;
+      return;
+    }
+    parsedTrainings.push({
+      id: `tr_${idx}_${Date.now()}`,
+      label,
+      wd,
+      sollHours: sh
+    });
+  });
+  if (invalidTraining || parsedTrainings.length === 0) {
+    showToast('Bitte Trainings mit gueltigem Tag und Soll-Stunden > 0 eingeben');
+    return;
+  }
+  user.trainings = parsedTrainings;
   normalizeTrainings(user);
   user.trainDays = [...new Set(user.trainings.map(t => t.wd))];
   user.hoursPerSession = defaultLogHours(user);
@@ -831,6 +847,7 @@ function saveSetup(userId) {
 
   // saveState() no longer throws (try-catch inside), so renderAll() is always reached
   const ok = saveState();
+  renderSidebar();
   renderSetup(userId);
   showToast(ok ? 'Einstellungen gespeichert' : 'Speichern fehlgeschlagen');
 }
@@ -855,7 +872,13 @@ function addLog(userId) {
     return;
   }
   user.log.push({ id:'l'+Date.now(), date, training, halle, hours });
-  saveState(); renderAll();
+  if (!saveState()) {
+    user.log.pop();
+    showToast('Speichern fehlgeschlagen');
+    return;
+  }
+  renderAll();
+  showToast('Trainingseintrag gespeichert');
 }
 function deleteLog(userId, logId) {
   const user = state.users.find(u=>u.id===userId);
@@ -923,23 +946,56 @@ function openDayDetails(userId, dateStr) {
 function openNewUserModal() {
   document.getElementById('nu_name').value = '';
   document.getElementById('nu_kontingent').value = '320';
-  document.getElementById('nu_hours').value = '3';
-  document.querySelectorAll('#nu_days input').forEach(cb=>cb.checked=false);
+  newUserTrainings = [
+    { label: 'Training 1', wd: 0, sollHours: 3 },
+    { label: 'Training 2', wd: 1, sollHours: 3 },
+    { label: 'Training 3', wd: 4, sollHours: 3 }
+  ];
+  renderNewUserTrainingList();
   document.getElementById('newUserModal').classList.add('open');
 }
 function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+function renderNewUserTrainingList() {
+  const list = document.getElementById('nu_training_list');
+  if (!list) return;
+  list.innerHTML = newUserTrainings.map((t, i) => `
+    <div class="training-item">
+      <input type="text" class="nu-tr-name" data-idx="${i}" value="${t.label}" placeholder="Trainingname">
+      <select class="nu-tr-day" data-idx="${i}">${WEEKDAYS.slice(0,6).map((wd, wdIdx)=>`<option value="${wdIdx}" ${wdIdx===t.wd?'selected':''}>${wd}</option>`).join('')}</select>
+      <input type="number" class="nu-tr-hours" data-idx="${i}" min="0.5" step="0.5" value="${t.sollHours}">
+      <button type="button" class="btn-icon nu-tr-del" data-idx="${i}" onclick="deleteNewUserTraining(${i})">×</button>
+    </div>
+  `).join('');
+}
+function addNewUserTraining() {
+  newUserTrainings.push({ label: `Training ${newUserTrainings.length+1}`, wd: 0, sollHours: 3 });
+  renderNewUserTrainingList();
+}
+function deleteNewUserTraining(idx) {
+  newUserTrainings.splice(idx, 1);
+  if (newUserTrainings.length === 0) newUserTrainings.push({ label: 'Training 1', wd: 0, sollHours: 3 });
+  renderNewUserTrainingList();
+}
 function createUser() {
   const name = document.getElementById('nu_name').value.trim();
   if (!name) return;
-  const trainDays  = Array.from(document.querySelectorAll('#nu_days input')).filter(cb=>cb.checked).map(cb=>parseInt(cb.value));
-  const defaultHours = parseFloat(document.getElementById('nu_hours').value)||3;
-  const normalizedTrainDays = trainDays.length ? trainDays : [0,1,4];
-  const trainings = normalizedTrainDays.map((wd, idx) => ({
-    id: `tr_${Date.now()}_${idx}`,
-    label: `Training ${idx+1}`,
-    wd,
-    sollHours: defaultHours
-  }));
+  const rows = document.querySelectorAll('#nu_training_list .training-item');
+  const parsed = [];
+  rows.forEach((row, idx) => {
+    const nameEl = row.querySelector('.nu-tr-name');
+    const dayEl = row.querySelector('.nu-tr-day');
+    const hoursEl = row.querySelector('.nu-tr-hours');
+    if (!nameEl || !dayEl || !hoursEl) return;
+    const label = nameEl.value.trim() || `Training ${idx+1}`;
+    const wd = parseInt(dayEl.value, 10);
+    const sollHours = parseFloat(hoursEl.value);
+    if (!Number.isInteger(wd) || wd < 0 || wd > 5) return;
+    if (!Number.isFinite(sollHours) || sollHours <= 0) return;
+    parsed.push({ id: `tr_${Date.now()}_${idx}`, label, wd, sollHours });
+  });
+  const trainings = parsed.length ? parsed : [{ id: `tr_${Date.now()}_0`, label: 'Training 1', wd: 0, sollHours: 3 }];
+  const defaultHours = trainings[0].sollHours;
+  const normalizedTrainDays = [...new Set(trainings.map(t => t.wd))];
   const user = {
     id: 'user_'+Date.now(),
     name,
@@ -953,16 +1009,72 @@ function createUser() {
   };
   state.users.push(user);
   state.activeUserId = user.id;
-  saveState();
+  if (!saveState()) {
+    state.users.pop();
+    state.activeUserId = state.users[0]?.id || null;
+    showToast('Speichern fehlgeschlagen');
+    return;
+  }
   closeModal('newUserModal');
   renderAll();
+  showToast('Neue Person gespeichert');
 }
 document.getElementById('newUserModal').addEventListener('click', function(e) {
   if (e.target === this) closeModal('newUserModal');
 });
+document.getElementById('nuAddTrainingBtn').addEventListener('click', function() {
+  addNewUserTraining();
+});
+document.getElementById('nu_training_list').addEventListener('click', function(e) {
+  const btn = e.target.closest('.nu-tr-del');
+  if (!btn) return;
+  const idx = parseInt(btn.dataset.idx, 10);
+  if (!Number.isInteger(idx)) return;
+  deleteNewUserTraining(idx);
+});
 document.getElementById('dayDetailModal').addEventListener('click', function(e) {
   if (e.target === this) closeModal('dayDetailModal');
 });
+
+// ── Export / Import ───────────────────────────────────────────────────────────
+function exportData() {
+  const json = JSON.stringify(state, null, 2);
+  const blob = new Blob([json], { type: 'application/json' });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  const date = new Date().toISOString().slice(0,10);
+  a.href     = url;
+  a.download = `trainings-tracker-backup-${date}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast('Backup gespeichert');
+}
+
+function importData(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      const imported = JSON.parse(e.target.result);
+      if (!imported.users || !Array.isArray(imported.users)) {
+        showToast('Ungültige Datei – Import abgebrochen');
+        return;
+      }
+      if (!confirm(`${imported.users.length} Person(en) importieren? Aktuelle Daten werden überschrieben.`)) return;
+      state = imported;
+      if (!state.activeUserId && state.users.length > 0) state.activeUserId = state.users[0].id;
+      saveState();
+      renderAll();
+      showToast('Daten erfolgreich importiert');
+    } catch(err) {
+      showToast('Fehler beim Lesen der Datei');
+    }
+  };
+  reader.readAsText(file);
+  // Reset so the same file can be re-selected
+  input.value = '';
+}
 
 // ── Reset ─────────────────────────────────────────────────────────────────────
 function resetApp() {
