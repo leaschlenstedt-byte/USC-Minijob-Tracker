@@ -1,0 +1,725 @@
+{
+  "users": [
+    {
+      "id": "user_1",
+      "name": "Lea",
+      "kontingent": 320,
+      "hoursPerSession": 3,
+      "trainDays": [
+        0,
+        1,
+        4
+      ],
+      "color": "#4f9cf9",
+      "ferien": [
+        {
+          "name": "Weihnachtsferien/Neujahr",
+          "start": "2026-01-01",
+          "end": "2026-01-06"
+        },
+        {
+          "name": "Frühjahrsferien",
+          "start": "2026-02-16",
+          "end": "2026-02-20"
+        },
+        {
+          "name": "Osterferien",
+          "start": "2026-03-30",
+          "end": "2026-04-10"
+        },
+        {
+          "name": "Pfingstferien",
+          "start": "2026-05-26",
+          "end": "2026-06-05"
+        },
+        {
+          "name": "Sommerferien",
+          "start": "2026-08-03",
+          "end": "2026-09-14"
+        },
+        {
+          "name": "Herbstferien",
+          "start": "2026-11-02",
+          "end": "2026-11-06"
+        },
+        {
+          "name": "Weihnachtsferien",
+          "start": "2026-12-24",
+          "end": "2026-12-31"
+        },
+        {
+          "name": "Heilige Drei Könige",
+          "start": "2026-01-06",
+          "end": "2026-01-06"
+        },
+        {
+          "name": "Karfreitag",
+          "start": "2026-04-03",
+          "end": "2026-04-03"
+        },
+        {
+          "name": "Ostermontag",
+          "start": "2026-04-06",
+          "end": "2026-04-06"
+        },
+        {
+          "name": "Maifeiertag",
+          "start": "2026-05-01",
+          "end": "2026-05-01"
+        },
+        {
+          "name": "Pfingstmontag",
+          "start": "2026-05-25",
+          "end": "2026-05-25"
+        },
+        {
+          "name": "1. Weihnachtstag",
+          "start": "2026-12-25",
+          "end": "2026-12-25"
+        }
+      ],
+      "log": [
+        {
+          "id": "l1",
+          "date": "2026-01-09",
+          "halle": "Element",
+          "hours": 3,
+          "training": "NK"
+        },
+        {
+          "id": "l2",
+          "date": "2026-01-12",
+          "halle": "Element",
+          "hours": 3,
+          "training": "DJC Kader"
+        },
+        {
+          "id": "l3",
+          "date": "2026-01-13",
+          "halle": "Element",
+          "hours": 3,
+          "training": "NK"
+        },
+        {
+          "id": "l4",
+          "date": "2026-01-16",
+          "halle": "Element",
+          "hours": 3,
+          "training": "NK"
+        },
+        {
+          "id": "l5",
+          "date": "2026-01-20",
+          "halle": "Element",
+          "hours": 3,
+          "training": "NK"
+        },
+        {
+          "id": "l6",
+          "date": "2026-01-23",
+          "halle": "Element",
+          "hours": 3,
+          "training": "NK"
+        },
+        {
+          "id": "l7",
+          "date": "2026-01-26",
+          "halle": "Element",
+          "hours": 3,
+          "training": "DJC Kader"
+        },
+        {
+          "id": "l8",
+          "date": "2026-01-27",
+          "halle": "Element",
+          "hours": 3,
+          "training": "NK"
+        },
+        {
+          "id": "l9",
+          "date": "2026-01-30",
+          "halle": "Element",
+          "hours": 3,
+          "training": "NK"
+        },
+        {
+          "id": "l10",
+          "date": "2026-02-02",
+          "halle": "Boulderwelt Ost",
+          "hours": 3,
+          "training": "DJC Kader"
+        },
+        {
+          "id": "l11",
+          "date": "2026-02-03",
+          "halle": "Element",
+          "hours": 3,
+          "training": "NK"
+        },
+        {
+          "id": "l12",
+          "date": "2026-02-09",
+          "halle": "Element",
+          "hours": 3,
+          "training": "DJC Kader"
+        },
+        {
+          "id": "l13",
+          "date": "2026-02-10",
+          "halle": "Element",
+          "hours": 3,
+          "training": "NK"
+        },
+        {
+          "id": "l14",
+          "date": "2026-02-13",
+          "halle": "Element",
+          "hours": 3,
+          "training": "NK"
+        },
+        {
+          "id": "l15",
+          "date": "2026-02-24",
+          "halle": "Element",
+          "hours": 3,
+          "training": "NK"
+        },
+        {
+          "id": "l16",
+          "date": "2026-02-27",
+          "halle": "Element",
+          "hours": 3,
+          "training": "NK"
+        },
+        {
+          "id": "l17",
+          "date": "2026-03-02",
+          "halle": "Freimann",
+          "hours": 3,
+          "training": "DJC Kader"
+        },
+        {
+          "id": "l18",
+          "date": "2026-03-03",
+          "halle": "Thalkirchen",
+          "hours": 3,
+          "training": "NK"
+        },
+        {
+          "id": "l19",
+          "date": "2026-03-06",
+          "halle": "Freimann",
+          "hours": 3,
+          "training": "NK"
+        },
+        {
+          "id": "l20",
+          "date": "2026-03-09",
+          "halle": "Freimann",
+          "hours": 3,
+          "training": "DJC Kader"
+        },
+        {
+          "id": "l21",
+          "date": "2026-03-10",
+          "halle": "Thalkirchen",
+          "hours": 3,
+          "training": "NK"
+        },
+        {
+          "id": "l22",
+          "date": "2026-03-12",
+          "halle": "Thalkirchen",
+          "hours": 3,
+          "training": "NK",
+          "type": "scheduled"
+        },
+        {
+          "id": "l24",
+          "date": "2026-03-17",
+          "halle": "Thalkirchen",
+          "hours": 3,
+          "training": "NK"
+        },
+        {
+          "id": "l1774864732649",
+          "date": "2026-03-20",
+          "training": "NK",
+          "halle": "Freimann",
+          "hours": 3,
+          "type": "scheduled"
+        },
+        {
+          "id": "l1774864750216",
+          "date": "2026-03-24",
+          "training": "NK",
+          "halle": "Thalkirchen",
+          "hours": 3,
+          "type": "scheduled"
+        },
+        {
+          "id": "l1774864765583",
+          "date": "2026-03-27",
+          "training": "NK",
+          "halle": "Freimann",
+          "hours": 3,
+          "type": "scheduled"
+        },
+        {
+          "id": "l1774864774949",
+          "date": "2026-03-23",
+          "training": "DJC Kader",
+          "halle": "Freimann",
+          "hours": 3,
+          "type": "scheduled"
+        },
+        {
+          "id": "l1774866648764",
+          "date": "2026-01-15",
+          "training": "WK3",
+          "halle": "Element",
+          "hours": 3
+        },
+        {
+          "id": "l1774866917464",
+          "date": "2025-06-06",
+          "training": "DJC Kader",
+          "halle": "Element",
+          "hours": 3
+        }
+      ],
+      "trainings": [
+        {
+          "id": "tr_0_0_1774895439890",
+          "label": "DJC Kader",
+          "wds": [
+            0
+          ],
+          "sollHours": 3
+        },
+        {
+          "id": "tr_1_0_1774895439890",
+          "label": "NK",
+          "wds": [
+            1,
+            4
+          ],
+          "sollHours": 3
+        }
+      ],
+      "schedulePeriods": [
+        {
+          "id": "period_1774877480755",
+          "start": "2026-01-01",
+          "end": "2026-12-31",
+          "trainings": [
+            {
+              "id": "tr_0_0_1774895439890",
+              "label": "DJC Kader",
+              "wds": [
+                0
+              ],
+              "sollHours": 3
+            }
+          ]
+        },
+        {
+          "id": "period_1774877480755",
+          "start": "2026-01-01",
+          "end": "2026-12-31",
+          "trainings": [
+            {
+              "id": "tr_1_0_1774895439890",
+              "label": "NK",
+              "wds": [
+                1,
+                4
+              ],
+              "sollHours": 3
+            }
+          ]
+        }
+      ],
+      "absences": [
+        {
+          "id": "abs_1774895431206",
+          "type": "illness",
+          "start": "2026-03-16",
+          "end": "2026-03-16",
+          "note": ""
+        }
+      ]
+    },
+    {
+      "id": "user_1774876320312",
+      "name": "Cheyenne",
+      "kontingent": 302,
+      "hoursPerSession": 3,
+      "trainDays": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "color": "#34d399",
+      "trainings": [
+        {
+          "id": "tr_0_0_1774879268255",
+          "label": "DJC Kader",
+          "wds": [
+            0
+          ],
+          "sollHours": 3
+        },
+        {
+          "id": "tr_1_0_1774879268255",
+          "label": "NK",
+          "wds": [
+            1
+          ],
+          "sollHours": 3
+        },
+        {
+          "id": "tr_2_0_1774879268255",
+          "label": "LG02",
+          "wds": [
+            2
+          ],
+          "sollHours": 2.5
+        },
+        {
+          "id": "tr_3_0_1774879268255",
+          "label": "Wk2",
+          "wds": [
+            1,
+            3
+          ],
+          "sollHours": 3
+        }
+      ],
+      "ferien": [
+        {
+          "name": "Weihnachtsferien/Neujahr",
+          "start": "2026-01-01",
+          "end": "2026-01-06"
+        },
+        {
+          "name": "Frühjahrsferien",
+          "start": "2026-02-16",
+          "end": "2026-02-20"
+        },
+        {
+          "name": "Osterferien",
+          "start": "2026-03-30",
+          "end": "2026-04-10"
+        },
+        {
+          "name": "Pfingstferien",
+          "start": "2026-05-26",
+          "end": "2026-06-05"
+        },
+        {
+          "name": "Sommerferien",
+          "start": "2026-08-03",
+          "end": "2026-09-14"
+        },
+        {
+          "name": "Herbstferien",
+          "start": "2026-11-02",
+          "end": "2026-11-06"
+        },
+        {
+          "name": "Weihnachtsferien",
+          "start": "2026-12-24",
+          "end": "2026-12-31"
+        },
+        {
+          "name": "Heilige Drei Könige",
+          "start": "2026-01-06",
+          "end": "2026-01-06"
+        },
+        {
+          "name": "Karfreitag",
+          "start": "2026-04-03",
+          "end": "2026-04-03"
+        },
+        {
+          "name": "Ostermontag",
+          "start": "2026-04-06",
+          "end": "2026-04-06"
+        },
+        {
+          "name": "Maifeiertag",
+          "start": "2026-05-01",
+          "end": "2026-05-01"
+        },
+        {
+          "name": "Pfingstmontag",
+          "start": "2026-05-25",
+          "end": "2026-05-25"
+        },
+        {
+          "name": "1. Weihnachtstag",
+          "start": "2026-12-25",
+          "end": "2026-12-25"
+        }
+      ],
+      "log": [
+        {
+          "id": "l1774876404159",
+          "date": "2026-01-06",
+          "training": "Wk2",
+          "halle": "Element",
+          "hours": 3,
+          "type": "scheduled"
+        },
+        {
+          "id": "l1774876417696",
+          "date": "2026-01-08",
+          "training": "Wk2",
+          "halle": "Element",
+          "hours": 3,
+          "type": "scheduled"
+        },
+        {
+          "id": "l1774876427432",
+          "date": "2026-01-09",
+          "training": "NK",
+          "halle": "Element",
+          "hours": 3,
+          "type": "scheduled"
+        },
+        {
+          "id": "l1774876444621",
+          "date": "2026-01-13",
+          "training": "Wk2",
+          "halle": "Boudlerwelt Süd",
+          "hours": 3,
+          "type": "scheduled"
+        },
+        {
+          "id": "l1774876461310",
+          "date": "2026-01-15",
+          "training": "Wk2",
+          "halle": "Thalkirchen",
+          "hours": 3,
+          "type": "scheduled"
+        },
+        {
+          "id": "l1774876470791",
+          "date": "2026-01-20",
+          "training": "Wk2",
+          "halle": "Element",
+          "hours": 3,
+          "type": "scheduled"
+        },
+        {
+          "id": "l1774876483816",
+          "date": "2026-01-22",
+          "training": "Wk2",
+          "halle": "Boulderwelt Ost",
+          "hours": 3,
+          "type": "scheduled"
+        },
+        {
+          "id": "l1774876492016",
+          "date": "2026-01-26",
+          "training": "DJC Kader",
+          "halle": "Element",
+          "hours": 3,
+          "type": "scheduled"
+        },
+        {
+          "id": "l1774876525081",
+          "date": "2026-01-27",
+          "training": "Wk2",
+          "halle": "Element",
+          "hours": 3,
+          "type": "scheduled"
+        },
+        {
+          "id": "l1774876535984",
+          "date": "2026-01-28",
+          "training": "LG02",
+          "halle": "Element",
+          "hours": 2.5,
+          "type": "scheduled"
+        },
+        {
+          "id": "l1774876544310",
+          "date": "2026-02-02",
+          "training": "DJC Kader",
+          "halle": "Element",
+          "hours": 3,
+          "type": "scheduled"
+        },
+        {
+          "id": "l1774876553209",
+          "date": "2026-02-04",
+          "training": "LG02",
+          "halle": "Element",
+          "hours": 2.5,
+          "type": "scheduled"
+        },
+        {
+          "id": "l1774876560428",
+          "date": "2026-02-09",
+          "training": "DJC Kader",
+          "halle": "Element",
+          "hours": 3,
+          "type": "scheduled"
+        },
+        {
+          "id": "l1774876572201",
+          "date": "2026-03-02",
+          "training": "DJC Kader",
+          "halle": "Freimann",
+          "hours": 3,
+          "type": "scheduled"
+        },
+        {
+          "id": "l1774876620636",
+          "date": "2026-03-03",
+          "training": "NK",
+          "halle": "Thalkirchen",
+          "hours": 3,
+          "type": "scheduled"
+        },
+        {
+          "id": "l1774876633094",
+          "date": "2026-03-04",
+          "training": "LG02",
+          "halle": "Thalkirchen",
+          "hours": 2.5,
+          "type": "scheduled"
+        },
+        {
+          "id": "l1774876648677",
+          "date": "2026-03-11",
+          "training": "LG02",
+          "halle": "Thalkirchen",
+          "hours": 2.5,
+          "type": "scheduled"
+        },
+        {
+          "id": "l1774876718730",
+          "date": "2026-03-09",
+          "training": "DJC Kader",
+          "halle": "Freimann",
+          "hours": 3,
+          "type": "scheduled"
+        },
+        {
+          "id": "l1774876775046",
+          "date": "2026-03-10",
+          "training": "NK",
+          "halle": "Thalkirchen",
+          "hours": 3,
+          "type": "scheduled"
+        },
+        {
+          "id": "l1774876800736",
+          "date": "2026-03-23",
+          "training": "DJC Kader",
+          "halle": "Freimann",
+          "hours": 3,
+          "type": "scheduled"
+        }
+      ],
+      "schedulePeriods": [
+        {
+          "id": "period_1774877480755",
+          "start": "2026-01-01",
+          "end": "2026-12-31",
+          "trainings": [
+            {
+              "id": "tr_0_0_1774879268255",
+              "label": "DJC Kader",
+              "wds": [
+                0
+              ],
+              "sollHours": 3
+            }
+          ]
+        },
+        {
+          "id": "period_1774877480755",
+          "start": "2026-03-01",
+          "end": "2026-12-31",
+          "trainings": [
+            {
+              "id": "tr_1_0_1774879268255",
+              "label": "NK",
+              "wds": [
+                1
+              ],
+              "sollHours": 3
+            }
+          ]
+        },
+        {
+          "id": "period_1774877480755",
+          "start": "2026-03-01",
+          "end": "2026-12-31",
+          "trainings": [
+            {
+              "id": "tr_2_0_1774879268255",
+              "label": "LG02",
+              "wds": [
+                2
+              ],
+              "sollHours": 2.5
+            }
+          ]
+        },
+        {
+          "id": "period_1774877984149",
+          "start": "2026-01-01",
+          "end": "2026-01-27",
+          "trainings": [
+            {
+              "id": "tr_3_0_1774879268255",
+              "label": "Wk2",
+              "wds": [
+                1,
+                3
+              ],
+              "sollHours": 3
+            }
+          ]
+        }
+      ],
+      "absences": [
+        {
+          "id": "abs_1774878143721",
+          "type": "illness",
+          "start": "2026-03-16",
+          "end": "2026-03-18",
+          "note": ""
+        },
+        {
+          "id": "abs_1774878159958",
+          "type": "illness",
+          "start": "2026-03-24",
+          "end": "2026-03-25",
+          "note": ""
+        },
+        {
+          "id": "abs_1774878239454",
+          "type": "illness",
+          "start": "2026-01-22",
+          "end": "2026-01-22",
+          "note": ""
+        },
+        {
+          "id": "abs_1774878255489",
+          "type": "illness",
+          "start": "2026-01-26",
+          "end": "2026-01-27",
+          "note": ""
+        }
+      ]
+    }
+  ],
+  "activeUserId": "user_1"
+}

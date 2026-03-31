@@ -44,9 +44,14 @@ body { background: var(--bg); color: var(--text); font-family: var(--sans); min-
 .user-name { font-size: 13px; font-weight: 500; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .user-meta { font-size: 11px; color: var(--text3); font-family: var(--mono); }
 .user-status { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
-.sidebar-actions { padding: 12px; border-top: 1px solid var(--border); }
+.sidebar-actions { padding: 12px; border-top: 1px solid var(--border); display: flex; flex-direction: column; gap: 6px; }
+.sidebar-note { font-size: 11px; color: var(--text3); font-family: var(--mono); line-height: 1.4; padding: 4px 2px 0; }
 .btn-add-user { width: 100%; background: none; border: 1px dashed var(--border2); color: var(--text2); border-radius: 8px; padding: 10px; font-size: 13px; cursor: pointer; font-family: var(--sans); transition: all 0.15s; }
 .btn-add-user:hover { border-color: var(--accent); color: var(--accent); background: rgba(79,156,249,0.05); }
+.btn-add-user.danger { border-color: rgba(248,113,113,.3); color: var(--red); }
+.btn-add-user.danger:hover { border-color: var(--red); color: var(--red); background: var(--red-bg); }
+.btn-add-user.primary { border-color: rgba(79,156,249,.35); color: var(--accent); }
+.btn-add-user.primary:hover { border-color: var(--accent); color: var(--accent); background: rgba(79,156,249,0.08); }
 .tabs { display: flex; gap: 2px; background: var(--bg2); border-radius: 10px; padding: 3px; margin-bottom: 28px; width: fit-content; }
 .tab { padding: 7px 18px; border-radius: 8px; border: none; background: none; color: var(--text2); font-size: 13px; font-family: var(--sans); cursor: pointer; transition: all 0.15s; font-weight: 500; }
 .tab.active { background: var(--bg3); color: var(--text); }
@@ -90,10 +95,15 @@ body { background: var(--bg); color: var(--text); font-family: var(--sans); min-
 .badge.lgnk { background: rgba(79,156,249,0.12); color: var(--accent); }
 .badge.lgusk { background: rgba(52,211,153,0.12); color: var(--green); }
 .badge.other { background: var(--bg3); color: var(--text2); }
+.badge.custom { background: var(--amber-bg); color: var(--amber); }
 .btn-del { background: none; border: none; color: var(--text3); cursor: pointer; font-size: 16px; padding: 2px 6px; border-radius: 4px; transition: all 0.15s; }
 .btn-del:hover { background: var(--red-bg); color: var(--red); }
 .log-form { background: var(--bg2); border: 1px solid var(--border); border-radius: 12px; padding: 20px; margin-bottom: 20px; }
 .form-row { display: grid; grid-template-columns: 1fr 1fr 1fr auto; gap: 12px; align-items: end; }
+.log-mode-switch { display: inline-flex; gap: 6px; padding: 4px; background: var(--bg3); border: 1px solid var(--border); border-radius: 10px; margin-bottom: 14px; }
+.log-mode-btn { border: none; background: transparent; color: var(--text2); padding: 8px 12px; border-radius: 8px; cursor: pointer; font-family: var(--sans); font-size: 12px; }
+.log-mode-btn.active { background: rgba(79,156,249,0.12); color: var(--accent); }
+.log-hint { font-size: 11px; color: var(--text3); font-family: var(--mono); margin-top: 8px; }
 .form-group { display: flex; flex-direction: column; gap: 6px; }
 .form-group label { font-size: 11px; color: var(--text3); font-family: var(--mono); text-transform: uppercase; letter-spacing: 0.05em; }
 .form-group input, .form-group select { background: var(--bg3); border: 1px solid var(--border2); border-radius: 8px; padding: 9px 12px; color: var(--text); font-size: 13px; font-family: var(--sans); outline: none; transition: border-color 0.15s; width: 100%; }
@@ -122,6 +132,10 @@ body { background: var(--bg); color: var(--text); font-family: var(--sans); min-
 .btn-add-ferien { background: none; border: 1px dashed var(--border2); color: var(--text2); border-radius: 8px; padding: 8px; font-size: 12px; cursor: pointer; font-family: var(--sans); transition: all 0.15s; width: 100%; margin-top: 6px; }
 .btn-add-ferien:hover { border-color: var(--accent); color: var(--accent); }
 .setup-actions { display: flex; gap: 10px; margin-top: 20px; justify-content: flex-end; }
+.setup-status { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 18px; padding: 10px 12px; border: 1px solid var(--border); border-radius: 10px; background: rgba(255,255,255,0.02); }
+.setup-status strong { font-size: 12px; color: var(--text); font-family: var(--mono); }
+.setup-status span { font-size: 11px; color: var(--text2); }
+.setup-summary { font-size: 12px; color: var(--text2); line-height: 1.5; }
 .btn-secondary { background: var(--bg3); border: 1px solid var(--border2); color: var(--text); border-radius: 8px; padding: 9px 20px; font-size: 13px; font-family: var(--sans); cursor: pointer; transition: all 0.15s; }
 .btn-secondary:hover { border-color: var(--accent); color: var(--accent); }
 .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); display: flex; align-items: center; justify-content: center; z-index: 100; backdrop-filter: blur(4px); opacity: 0; pointer-events: none; transition: opacity 0.2s; }
@@ -140,7 +154,11 @@ body { background: var(--bg); color: var(--text); font-family: var(--sans); min-
 .day-log-meta span { font-size: 12px; color: var(--accent); font-family: var(--mono); }
 .day-log-halle { font-size: 12px; color: var(--text2); }
 .training-list { display: flex; flex-direction: column; gap: 8px; }
-.training-item { display: grid; grid-template-columns: 1.4fr 0.9fr 0.7fr 32px; gap: 8px; align-items: center; }
+.training-item { display: grid; grid-template-columns: 1.2fr 1.8fr 0.7fr 68px; gap: 8px; align-items: center; }
+.training-days { display: flex; gap: 6px; flex-wrap: wrap; }
+.day-chip { width: 30px; height: 30px; border-radius: 8px; border: 1px solid var(--border2); background: var(--bg3); color: var(--text2); font-size: 11px; font-family: var(--mono); cursor: pointer; transition: all 0.15s; }
+.day-chip.active { background: rgba(79,156,249,0.15); border-color: var(--accent); color: var(--accent); }
+.setup-muted { font-size: 11px; color: var(--text3); font-family: var(--mono); margin-top: 6px; }
 .empty { text-align: center; padding: 60px 20px; color: var(--text3); }
 .empty p { font-size: 14px; margin-top: 8px; }
 .no-user { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 60vh; color: var(--text3); gap: 12px; }
@@ -173,12 +191,14 @@ body { background: var(--bg); color: var(--text); font-family: var(--sans); min-
     <div class="user-list" id="userList"></div>
     <div class="sidebar-actions">
       <button class="btn-add-user" onclick="openNewUserModal()">+ Neue Person hinzufügen</button>
-      <button class="btn-add-user" style="margin-top:6px;border-color:rgba(79,156,249,.3);color:var(--accent)" onclick="exportData()">↓ Daten exportieren</button>
-      <label class="btn-add-user" style="margin-top:6px;border-color:rgba(79,156,249,.3);color:var(--accent);cursor:pointer;display:block;text-align:center">
+      <button class="btn-add-user primary" onclick="saveNow()">Speichern</button>
+      <button class="btn-add-user primary" onclick="exportData()">Backup exportieren</button>
+      <label class="btn-add-user primary" style="cursor:pointer;display:block;text-align:center">
         ↑ Daten importieren
         <input type="file" id="importFile" accept=".json" style="display:none" onchange="importData(this)">
       </label>
-      <button class="btn-add-user" style="margin-top:6px;border-color:rgba(248,113,113,.3);color:#f87171" onclick="resetApp()">↺ App zurücksetzen</button>
+      <button class="btn-add-user danger" onclick="quitApp()">App beenden</button>
+      <div class="sidebar-note">Aenderungen werden automatisch in <code>data.json</code> gespeichert.</div>
     </div>
   </aside>
   <main class="main" id="mainContent">
@@ -206,13 +226,14 @@ body { background: var(--bg); color: var(--text); font-family: var(--sans); min-
     </div>
     <div class="form-group">
       <label>Trainings mit Soll-Zeit</label>
-      <div style="display:grid;grid-template-columns:1.4fr 0.9fr 0.7fr 32px;gap:8px;margin-bottom:6px">
+      <div style="display:grid;grid-template-columns:1.2fr 1.8fr 0.7fr 68px;gap:8px;margin-bottom:6px">
         <span style="font-size:10px;color:var(--text3);font-family:var(--mono);text-transform:uppercase;letter-spacing:.05em">Training</span>
-        <span style="font-size:10px;color:var(--text3);font-family:var(--mono);text-transform:uppercase;letter-spacing:.05em">Tag</span>
+        <span style="font-size:10px;color:var(--text3);font-family:var(--mono);text-transform:uppercase;letter-spacing:.05em">Tage</span>
         <span style="font-size:10px;color:var(--text3);font-family:var(--mono);text-transform:uppercase;letter-spacing:.05em">Soll (h)</span>
         <span></span>
       </div>
       <div class="training-list" id="nu_training_list"></div>
+      <div class="setup-muted">Ein Training kann mehreren Tagen pro Woche zugeordnet werden.</div>
       <button type="button" class="btn-add-ferien" id="nuAddTrainingBtn" style="margin-top:8px" onclick="addNewUserTraining()">+ Training hinzufügen</button>
     </div>
     <div class="modal-actions">
@@ -233,10 +254,45 @@ body { background: var(--bg); color: var(--text); font-family: var(--sans); min-
   </div>
 </div>
 
+<!-- Edit Log Modal -->
+<div class="modal-overlay" id="editLogModal">
+  <div class="modal">
+    <h2>Trainingseintrag bearbeiten</h2>
+    <div class="form-group">
+      <label>Datum</label>
+      <input type="date" id="el_date">
+    </div>
+    <div class="log-mode-switch" style="margin-bottom:18px">
+      <button type="button" class="log-mode-btn active" data-edit-mode="scheduled" onclick="setEditLogMode('scheduled')">Soll-Training</button>
+      <button type="button" class="log-mode-btn" data-edit-mode="custom" onclick="setEditLogMode('custom')">Einmalig / Vertretung</button>
+    </div>
+    <div class="form-group">
+      <label id="el_training_label">Soll-Training</label>
+      <select id="el_training_select"></select>
+      <input type="text" id="el_training" placeholder="z.B. Vertretung Jugend" style="display:none;margin-top:8px">
+    </div>
+    <div class="form-group">
+      <label>Kletterhalle</label>
+      <input type="text" id="el_halle" placeholder="z.B. Element">
+    </div>
+    <div class="form-group">
+      <label>Stunden</label>
+      <input type="number" id="el_hours" min="0.5" max="12" step="0.5">
+    </div>
+    <div class="modal-actions">
+      <button class="btn-secondary" onclick="closeModal('editLogModal')">Abbrechen</button>
+      <button class="btn-primary" onclick="saveEditedLog()">Speichern</button>
+    </div>
+  </div>
+</div>
+
 <script>
 // ── State ─────────────────────────────────────────────────────────────────────
 const STORAGE_KEY = 'trainings_tracker_v1';
+const API_STATE_URL = '/api/state';
 const YEAR = new Date().getFullYear();
+const YEAR_START = `${YEAR}-01-01`;
+const YEAR_END = `${YEAR}-12-31`;
 const AVATARS = ['#4f9cf9','#34d399','#f87171','#fbbf24','#a78bfa','#fb923c','#e879f9','#2dd4bf'];
 const WEEKDAYS = ['Mo','Di','Mi','Do','Fr','Sa','So'];
 const DEFAULT_FERIEN = [
@@ -257,6 +313,8 @@ const DEFAULT_FERIEN = [
 let state = { users: [], activeUserId: null };
 let currentTab = 'dashboard';
 let newUserTrainings = [];
+let settingsDraft = null;
+let editingLog = null;
 
 // ── Toast ─────────────────────────────────────────────────────────────────────
 function showToast(msg) {
@@ -269,20 +327,43 @@ function showToast(msg) {
 // ── Storage ───────────────────────────────────────────────────────────────────
 function loadState() {
   try {
+    const req = new XMLHttpRequest();
+    req.open('GET', API_STATE_URL, false);
+    req.send();
+    if (req.status >= 200 && req.status < 300 && req.responseText) {
+      const serverState = JSON.parse(req.responseText);
+      if (serverState && Array.isArray(serverState.users)) {
+        state = serverState;
+        try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch(e) {}
+        return;
+      }
+    }
+  } catch(e) {
+    console.warn('Dateispeicherung nicht verfuegbar, nutze localStorage:', e);
+  }
+  try {
     const s = localStorage.getItem(STORAGE_KEY);
     if (s) state = JSON.parse(s);
   } catch(e) {}
 }
 
-// FIX 1: saveState is now wrapped in try-catch so a storage error never
-// crashes the calling function and blocks the UI from updating.
 function saveState() {
+  let savedToFile = false;
+  try {
+    const req = new XMLHttpRequest();
+    req.open('POST', API_STATE_URL, false);
+    req.setRequestHeader('Content-Type', 'application/json');
+    req.send(JSON.stringify(state));
+    savedToFile = req.status >= 200 && req.status < 300;
+  } catch(e) {
+    console.warn('Dateispeicherung nicht verfuegbar:', e);
+  }
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-    return true;
+    return savedToFile || true;
   } catch(e) {
-    console.warn('localStorage nicht verfügbar:', e);
-    return false;
+    console.warn('localStorage nicht verfuegbar:', e);
+    return savedToFile;
   }
 }
 function persistAndToast(successMsg, errorMsg) {
@@ -290,50 +371,11 @@ function persistAndToast(successMsg, errorMsg) {
   showToast(ok ? successMsg : errorMsg);
   return ok;
 }
-
-// ── Seed data ─────────────────────────────────────────────────────────────────
-function seedDefaultUser() {
-  if (state.users.length > 0) return;
-  const user = {
-    id: 'user_1',
-    name: 'Mein Profil',
-    kontingent: 320,
-    hoursPerSession: 3,
-    trainDays: [0,1,4],
-    color: AVATARS[0],
-    ferien: JSON.parse(JSON.stringify(DEFAULT_FERIEN)),
-    log: [
-      {id:'l1',  date:'2026-01-09', gruppe:'LGNK',      halle:'Element',         hours:3},
-      {id:'l2',  date:'2026-01-12', gruppe:'LGUSCKade', halle:'Element',         hours:3},
-      {id:'l3',  date:'2026-01-13', gruppe:'LGNK',      halle:'Element',         hours:3},
-      {id:'l4',  date:'2026-01-16', gruppe:'LGNK',      halle:'Element',         hours:3},
-      {id:'l5',  date:'2026-01-20', gruppe:'LGNK',      halle:'Element',         hours:3},
-      {id:'l6',  date:'2026-01-23', gruppe:'LGNK',      halle:'Element',         hours:3},
-      {id:'l7',  date:'2026-01-26', gruppe:'LGUSCKade', halle:'Element',         hours:3},
-      {id:'l8',  date:'2026-01-27', gruppe:'LGNK',      halle:'Element',         hours:3},
-      {id:'l9',  date:'2026-01-30', gruppe:'LGNK',      halle:'Element',         hours:3},
-      {id:'l10', date:'2026-02-02', gruppe:'LGUSCKade', halle:'Boulderwelt Ost', hours:3},
-      {id:'l11', date:'2026-02-03', gruppe:'LGNK',      halle:'Element',         hours:3},
-      {id:'l12', date:'2026-02-09', gruppe:'LGUSCKade', halle:'Element',         hours:3},
-      {id:'l13', date:'2026-02-10', gruppe:'LGNK',      halle:'Element',         hours:3},
-      {id:'l14', date:'2026-02-13', gruppe:'LGNK',      halle:'Element',         hours:3},
-      {id:'l15', date:'2026-02-24', gruppe:'LGNK',      halle:'Element',         hours:3},
-      {id:'l16', date:'2026-02-27', gruppe:'LGNK',      halle:'Element',         hours:3},
-      {id:'l17', date:'2026-03-02', gruppe:'LGUSCKade', halle:'Freimann',        hours:3},
-      {id:'l18', date:'2026-03-03', gruppe:'LGNK',      halle:'Thalkirchen',     hours:3},
-      {id:'l19', date:'2026-03-06', gruppe:'LGNK',      halle:'Freimann',        hours:3},
-      {id:'l20', date:'2026-03-09', gruppe:'LGUSCKade', halle:'Freimann',        hours:3},
-      {id:'l21', date:'2026-03-10', gruppe:'LGNK',      halle:'Thalkirchen',     hours:3},
-      {id:'l22', date:'2026-03-12', gruppe:'LGNK',      halle:'Thalkirchen',     hours:3},
-      {id:'l23', date:'2026-03-16', gruppe:'LGUSCKade', halle:'Freimann',        hours:3},
-      {id:'l24', date:'2026-03-17', gruppe:'LGNK',      halle:'Thalkirchen',     hours:3},
-    ]
-  };
-  state.users.push(user);
-  state.activeUserId = user.id;
-  saveState();
+function saveNow() {
+  persistAndToast('Daten gespeichert', 'Speichern fehlgeschlagen');
 }
 
+// ── Seed data ─────────────────────────────────────────────────────────────────
 // ── Date helpers ──────────────────────────────────────────────────────────────
 function toISO(d) {
   return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
@@ -350,36 +392,329 @@ function isFerien(dateStr, ferien) {
 }
 function addDays(d, n) { const r = new Date(d); r.setDate(r.getDate()+n); return r; }
 function today() { return toISO(new Date()); }
+function isValidISODate(value) {
+  return /^\d{4}-\d{2}-\d{2}$/.test(value || '');
+}
+function isWorkday(dateStr) {
+  const wd = weekdayFromISO(dateStr);
+  return wd !== null && wd >= 0 && wd <= 4;
+}
+function roundHalf(value) {
+  return Math.round(value * 2) / 2;
+}
+function formatHours(value) {
+  const rounded = Math.round((Number(value) || 0) * 10) / 10;
+  return Number.isInteger(rounded) ? String(rounded) : rounded.toFixed(1);
+}
+function getDailyVacationCredit(user) {
+  return user.kontingent / 260;
+}
+function getDefaultVacationDates(user, limit = 20) {
+  const summerFerien = (user.ferien || []).find(f => (f.name || '').toLowerCase().includes('sommerferien'));
+  const source = summerFerien
+    ? [{ start: summerFerien.start, end: summerFerien.end }]
+    : (user.ferien || []).map(f => ({ start: f.start, end: f.end }));
+  const dates = [];
+  const seen = new Set();
+  source.forEach(range => {
+    if (!isValidISODate(range.start) || !isValidISODate(range.end)) return;
+    let d = new Date(`${range.start}T12:00:00`);
+    const end = new Date(`${range.end}T12:00:00`);
+    while (d <= end && dates.length < limit) {
+      const ds = toISO(d);
+      if (isWorkday(ds) && !seen.has(ds)) {
+        seen.add(ds);
+        dates.push(ds);
+      }
+      d = addDays(d, 1);
+    }
+  });
+  return dates.slice(0, limit);
+}
+function getDefaultVacationDaysCount(user) {
+  return getDefaultVacationDates(user, 20).length;
+}
+function normalizeTrainingItems(items, fallbackHours = 3) {
+  return (Array.isArray(items) ? items : [])
+    .map((t, idx) => ({
+      id: t.id || `tr_${idx}_${Date.now()}`,
+      label: (t.label || 'Training').trim(),
+      wds: Array.isArray(t.wds)
+        ? [...new Set(t.wds.map(Number).filter(wd => Number.isInteger(wd) && wd >= 0 && wd <= 5))].sort((a, b) => a - b)
+        : [Number.isInteger(t.wd) ? t.wd : 0],
+      sollHours: Number.isFinite(Number(t.sollHours)) && Number(t.sollHours) > 0 ? Number(t.sollHours) : fallbackHours
+    }))
+    .filter(t => t.wds.length > 0);
+}
 function normalizeTrainings(user) {
+  if (Array.isArray(user.schedulePeriods) && user.schedulePeriods.length > 0) {
+    const trainings = user.schedulePeriods.flatMap(period => normalizeTrainingItems(period.trainings, user.hoursPerSession || 3));
+    if (trainings.length > 0) return trainings;
+  }
   if (Array.isArray(user.trainings) && user.trainings.length > 0) {
-    user.trainings = user.trainings
-      .map((t, idx) => ({
-        id: t.id || `tr_${idx}_${Date.now()}`,
-        label: (t.label || 'Training').trim(),
-        wd: Number.isInteger(t.wd) ? t.wd : 0,
-        sollHours: Number.isFinite(Number(t.sollHours)) && Number(t.sollHours) > 0 ? Number(t.sollHours) : (user.hoursPerSession || 3)
-      }))
-      .filter(t => t.wd >= 0 && t.wd <= 5);
+    user.trainings = normalizeTrainingItems(user.trainings, user.hoursPerSession || 3);
     if (user.trainings.length > 0) return user.trainings;
   }
   const fallbackDays = Array.isArray(user.trainDays) && user.trainDays.length ? user.trainDays : [0,1,4];
   user.trainings = fallbackDays.map((wd, idx) => ({
     id: `tr_${idx}_${Date.now()}`,
     label: `Training ${idx+1}`,
-    wd,
+    wds: [wd],
     sollHours: user.hoursPerSession || 3
   }));
   return user.trainings;
+}
+function normalizeSchedulePeriods(user) {
+  if (Array.isArray(user.schedulePeriods) && user.schedulePeriods.length > 0) {
+    user.schedulePeriods = user.schedulePeriods
+      .map((period, idx) => ({
+        id: period.id || `period_${idx}_${Date.now()}`,
+        start: isValidISODate(period.start) ? period.start : YEAR_START,
+        end: isValidISODate(period.end) ? period.end : YEAR_END,
+        trainings: normalizeTrainingItems(period.trainings, user.hoursPerSession || 3)
+      }))
+      .filter(period => period.trainings.length > 0 && period.start <= period.end);
+    if (user.schedulePeriods.length > 0) return user.schedulePeriods;
+  }
+  const legacyTrainings = normalizeTrainings(user);
+  user.schedulePeriods = [{
+    id: `period_${Date.now()}`,
+    start: YEAR_START,
+    end: YEAR_END,
+    trainings: legacyTrainings.map(t => ({ ...t, wds: [...(t.wds || [])] }))
+  }];
+  return user.schedulePeriods;
+}
+function normalizeAbsences(user) {
+  user.absences = (Array.isArray(user.absences) ? user.absences : [])
+    .map((a, idx) => ({
+      id: a.id || `abs_${idx}_${Date.now()}`,
+      type: a.type === 'vacation' ? 'vacation' : 'illness',
+      start: isValidISODate(a.start) ? a.start : today(),
+      end: isValidISODate(a.end) ? a.end : today(),
+      note: (a.note || '').trim()
+    }))
+    .filter(a => a.start <= a.end);
+  return user.absences;
 }
 function defaultLogHours(user) {
   const trainings = normalizeTrainings(user);
   return trainings[0]?.sollHours || user.hoursPerSession || 3;
 }
+function buildSettingsDraft(user) {
+  const schedulePeriods = normalizeSchedulePeriods(user).flatMap((period, idx) =>
+    normalizeTrainingItems(period.trainings, defaultLogHours(user)).map((t, tIdx) => ({
+      id: period.id || `period_${idx}_${Date.now()}`,
+      start: period.start,
+      end: period.end,
+      trainings: [{
+        id: t.id || `tr_${idx}_${tIdx}_${Date.now()}`,
+        label: (t.label || `Training ${tIdx+1}`).trim() || `Training ${tIdx+1}`,
+        wds: [...(t.wds || [])],
+        sollHours: t.sollHours
+      }]
+    }))
+  );
+  const ferien = (user.ferien || []).map(f => ({
+    name: f.name || 'Ferien',
+    start: f.start || today(),
+    end: f.end || today()
+  }));
+  const absences = normalizeAbsences(user).map(a => ({ ...a }));
+  return {
+    userId: user.id,
+    name: user.name || '',
+    kontingent: user.kontingent || 320,
+    color: user.color || AVATARS[0],
+    schedulePeriods: schedulePeriods.length ? schedulePeriods : [{
+      id: `period_${Date.now()}`,
+      start: YEAR_START,
+      end: YEAR_END,
+      trainings: [{ id: `tr_${Date.now()}`, label: 'Training 1', wds: [0], sollHours: 3 }]
+    }],
+    ferien,
+    absences,
+    dirty: false
+  };
+}
+function markSettingsDirty() {
+  if (settingsDraft) settingsDraft.dirty = true;
+}
+function weekdayFromISO(dateStr) {
+  const d = new Date(`${dateStr}T12:00:00`);
+  if (Number.isNaN(d.getTime())) return null;
+  const dow = d.getDay();
+  return dow === 0 ? 6 : dow - 1;
+}
+function getLogTrainingLabel(user, entry) {
+  const explicit = (entry.training || '').trim();
+  if (explicit) return explicit;
+  const legacy = (entry.gruppe || '').trim();
+  if (!legacy) return 'Training';
+  const wd = entry.date ? weekdayFromISO(entry.date) : null;
+  if (wd !== null) {
+    const match = normalizeTrainings(user).find(t => (t.wds || []).includes(wd));
+    if (match) return match.label;
+  }
+  return 'Einmaliges Training';
+}
+function getAbsence(dateStr, absences) {
+  return (absences || []).find(a => dateStr >= a.start && dateStr <= a.end) || null;
+}
+function migrateLegacyLogEntries() {
+  let changed = false;
+  state.users.forEach(user => {
+    normalizeTrainings(user);
+    user.log = (user.log || []).map(entry => {
+      if (entry.training && !entry.gruppe) return entry;
+      changed = true;
+      const normalized = {
+        ...entry,
+        training: getLogTrainingLabel(user, entry)
+      };
+      delete normalized.gruppe;
+      return normalized;
+    });
+  });
+  if (changed) saveState();
+}
+function migrateUsersData() {
+  let changed = false;
+  state.users.forEach(user => {
+    const beforePeriods = JSON.stringify(user.schedulePeriods || null);
+    const beforeAbsences = JSON.stringify(user.absences || null);
+    normalizeSchedulePeriods(user);
+    normalizeAbsences(user);
+    if (JSON.stringify(user.schedulePeriods) !== beforePeriods || JSON.stringify(user.absences) !== beforeAbsences) {
+      changed = true;
+    }
+  });
+  if (changed) saveState();
+}
+function ensureSettingsDraft(user) {
+  if (!settingsDraft || settingsDraft.userId !== user.id) {
+    settingsDraft = buildSettingsDraft(user);
+  }
+  return settingsDraft;
+}
+function syncSettingsField(field, value) {
+  if (!settingsDraft) return;
+  settingsDraft[field] = value;
+  markSettingsDirty();
+}
+function updateDraftTraining(idx, field, value) {
+  if (!settingsDraft) return;
+  const periodIdx = Number(idx);
+  const training = settingsDraft.schedulePeriods?.[periodIdx]?.trainings?.[0];
+  if (!training) return;
+  if (field === 'label') training.label = value;
+  if (field === 'sollHours') training.sollHours = Number.parseFloat(value);
+  markSettingsDirty();
+}
+function toggleDraftTrainingDay(periodIdx, wd) {
+  if (!settingsDraft) return;
+  const training = settingsDraft.schedulePeriods?.[periodIdx]?.trainings?.[0];
+  if (!training) return;
+  const days = training.wds || [];
+  if (days.includes(wd)) {
+    if (days.length === 1) return;
+    training.wds = days.filter(d => d !== wd);
+  } else {
+    training.wds = [...days, wd].sort((a, b) => a - b);
+  }
+  markSettingsDirty();
+  renderSetup(settingsDraft.userId);
+}
+function updateDraftPeriodField(periodIdx, field, value) {
+  if (!settingsDraft?.schedulePeriods?.[periodIdx]) return;
+  settingsDraft.schedulePeriods[periodIdx][field] = value;
+  markSettingsDirty();
+}
+function updateDraftFerien(idx, field, value) {
+  if (!settingsDraft || !settingsDraft.ferien[idx]) return;
+  settingsDraft.ferien[idx][field] = value;
+  markSettingsDirty();
+}
+function updateDraftAbsence(idx, field, value) {
+  if (!settingsDraft || !settingsDraft.absences[idx]) return;
+  settingsDraft.absences[idx][field] = value;
+  markSettingsDirty();
+}
+function getSettingsSummary(draft) {
+  return draft.schedulePeriods
+    .map(period => {
+      const t = period.trainings?.[0];
+      if (!t) return '';
+      return `${period.start} bis ${period.end}: ${(t.wds || []).map(wd => WEEKDAYS[wd] || '??').join('/')} ${t.label || 'Training'} ${Number(t.sollHours) || 0}h`;
+    })
+    .filter(Boolean)
+    .join(' | ') || 'Noch keine Soll-Trainings';
+}
+function getUserPlanSummary(user) {
+  const periods = normalizeSchedulePeriods(user);
+  if (!periods.length) return 'Noch keine Soll-Trainings';
+  if (periods.length === 1 && periods[0].start === YEAR_START && periods[0].end === YEAR_END) {
+    return periods[0].trainings
+      .map(t => `${(t.wds || []).map(wd => WEEKDAYS[wd]).join('/')} ${t.label} ${t.sollHours}h`)
+      .join(' · ');
+  }
+  const activeToday = periods.filter(period => today() >= period.start && today() <= period.end);
+  const activeText = activeToday.length
+    ? `Aktuell: ${activeToday.flatMap(period => period.trainings).map(t => `${(t.wds || []).map(wd => WEEKDAYS[wd]).join('/')} ${t.label} ${t.sollHours}h`).join(' · ')}`
+    : 'Heute ist kein Zeitraum aktiv';
+  return `${periods.length} Zeitraeume hinterlegt · ${activeText}`;
+}
+function getLogEntryType(user, entry) {
+  if (entry.type === 'custom') return 'custom';
+  const label = getLogTrainingLabel(user, entry);
+  return normalizeTrainings(user).some(t => t.label === label) ? 'other' : 'custom';
+}
+function getOffPlanLogs(user, dateStr) {
+  const scheduledLabels = new Set(
+    computeKalender(user)
+      .filter(r => r.date === dateStr)
+      .map(r => r.trainingLabel)
+  );
+  return (user.log || []).filter(l => {
+    if (l.date !== dateStr) return false;
+    if (getLogEntryType(user, l) === 'custom') return true;
+    return !scheduledLabels.has(getLogTrainingLabel(user, l));
+  });
+}
+function setLogMode(mode) {
+  const isCustom = mode === 'custom';
+  document.querySelectorAll('.log-mode-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.mode === mode);
+  });
+  const sollWrap = document.getElementById('lf_soll_wrap');
+  const customWrap = document.getElementById('lf_custom_wrap');
+  const customInput = document.getElementById('lf_custom_training');
+  const select = document.getElementById('lf_training');
+  if (sollWrap) sollWrap.style.display = isCustom ? 'none' : 'flex';
+  if (customWrap) customWrap.style.display = isCustom ? 'flex' : 'none';
+  if (customInput) customInput.required = isCustom;
+  if (select && isCustom) select.selectedIndex = 0;
+}
+function setEditLogMode(mode) {
+  document.querySelectorAll('[data-edit-mode]').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.editMode === mode);
+  });
+  const label = document.getElementById('el_training_label');
+  const select = document.getElementById('el_training_select');
+  const input = document.getElementById('el_training');
+  if (!label || !select || !input) return;
+  const isCustom = mode === 'custom';
+  label.textContent = isCustom ? 'Einmaliges Training' : 'Soll-Training';
+  select.style.display = isCustom ? 'none' : 'block';
+  input.style.display = isCustom ? 'block' : 'none';
+  input.required = isCustom;
+}
 
 // ── Compute Soll-Kalender ─────────────────────────────────────────────────────
 function computeKalender(user) {
   const rows = [];
-  const trainings = normalizeTrainings(user);
+  const periods = normalizeSchedulePeriods(user);
+  const absences = normalizeAbsences(user);
   let d = new Date(YEAR, 0, 1);
   const end = new Date(YEAR, 11, 31);
   let kum = 0;
@@ -387,13 +722,27 @@ function computeKalender(user) {
     const dow = d.getDay();
     const wd = dow === 0 ? 6 : dow - 1;
     const ds = toISO(d);
-    const dayTrainings = trainings.filter(t => t.wd === wd);
+    const activePeriods = periods.filter(period => ds >= period.start && ds <= period.end);
+    const dayTrainings = activePeriods.flatMap(period =>
+      normalizeTrainingItems(period.trainings, user.hoursPerSession || 3).filter(t => (t.wds || []).includes(wd))
+    );
     if (dayTrainings.length) {
       dayTrainings.forEach(t => {
         const ferienName = isFerien(ds, user.ferien);
+        const absence = getAbsence(ds, absences);
         const zaehlt = !ferienName;
         if (zaehlt) kum += t.sollHours;
-        rows.push({ date: ds, wd, zaehlt, ferienName, kum, sollHours: t.sollHours, trainingLabel: t.label });
+        rows.push({
+          date: ds,
+          wd,
+          zaehlt,
+          ferienName,
+          absenceType: absence?.type || null,
+          absenceNote: absence?.note || '',
+          kum,
+          sollHours: t.sollHours,
+          trainingLabel: t.label
+        });
       });
     }
     d = addDays(d, 1);
@@ -403,15 +752,85 @@ function computeKalender(user) {
 function computeStats(user) {
   const kal = computeKalender(user);
   const todayStr = today();
-  const logDates = new Set(user.log.map(l => l.date));
-  const istTotal = user.log.reduce((s,l) => s+l.hours, 0);
-  const totalSoll = kal.filter(r=>r.zaehlt).reduce((s,r)=>s+r.sollHours, 0) || 0;
-  const puffer = totalSoll - user.kontingent;
-  const sollHeute = kal.filter(r=>r.zaehlt && r.date <= todayStr).reduce((s,r)=>s+r.sollHours, 0);
-  const missed = kal.filter(r=>r.zaehlt && r.date < todayStr && !logDates.has(r.date));
+  const yearPrefix = `${YEAR}-`;
+  const yearLogs = (user.log || []).filter(l => (l.date || '').startsWith(yearPrefix));
+  const previousLogs = (user.log || []).filter(l => {
+    const date = l.date || '';
+    return /^\d{4}-\d{2}-\d{2}$/.test(date) && Number(date.slice(0, 4)) < YEAR;
+  });
+  const logDates = new Set(yearLogs.map(l => l.date));
+  const monthSollHours = Array(12).fill(0);
+  const monthScheduledAbsenceCredits = Array(12).fill(0);
+  const monthHolidayVacationPlanCredits = Array(12).fill(0);
+  kal.forEach(r => {
+    const mi = monthIndexFromISO(r.date);
+    if (mi < 0) return;
+    if (r.zaehlt) monthSollHours[mi] += r.sollHours;
+    if (r.absenceType && !r.ferienName && r.date <= todayStr && !logDates.has(r.date)) {
+      monthScheduledAbsenceCredits[mi] += r.sollHours;
+    }
+  });
+  const dailyVacationCredit = getDailyVacationCredit(user);
+  const defaultVacationDates = getDefaultVacationDates(user, 20);
+  defaultVacationDates.forEach(ds => {
+    const mi = monthIndexFromISO(ds);
+    if (mi < 0) return;
+    monthHolidayVacationPlanCredits[mi] += dailyVacationCredit;
+  });
+  const rawIstTotal = yearLogs.reduce((s,l) => s+l.hours, 0);
+  const scheduledAbsenceCreditHours = monthScheduledAbsenceCredits.reduce((sum, value) => sum + value, 0);
+  const holidayVacationCreditPlannedHours = monthHolidayVacationPlanCredits.reduce((sum, value) => sum + value, 0);
+  const absenceCreditHours = scheduledAbsenceCreditHours;
+  const istTotal = rawIstTotal + absenceCreditHours;
+  const totalWorkloadSoll = monthSollHours.reduce((sum, value) => sum + value, 0) || 0;
+  const effectiveTrainingTarget = Math.max(0, roundHalf(user.kontingent - holidayVacationCreditPlannedHours));
+  const baseWorkloadToDate = kal.filter(r=>r.zaehlt && r.date <= todayStr).reduce((s,r)=>s+r.sollHours, 0);
+  const sollHeute = totalWorkloadSoll > 0
+    ? roundHalf((baseWorkloadToDate / totalWorkloadSoll) * effectiveTrainingTarget)
+    : 0;
+  const totalSoll = effectiveTrainingTarget;
+  const puffer = roundHalf(totalWorkloadSoll - effectiveTrainingTarget);
+  const missed = kal.filter(r=>r.zaehlt && !r.absenceType && r.date < todayStr && !logDates.has(r.date));
   const diff = istTotal - sollHeute;
   const pufferRest = puffer + diff;
-  return { kal, istTotal, totalSoll, sollHeute, diff, puffer, pufferRest, missed, logDates };
+  const workloadPuffer = roundHalf(totalWorkloadSoll + holidayVacationCreditPlannedHours - user.kontingent);
+  const remainingContractHours = Math.max(0, roundHalf(effectiveTrainingTarget - istTotal));
+  const remainingMonths = Math.max(1, (YEAR - Number(todayStr.slice(0, 4))) * 12 + (12 - Number(todayStr.slice(5, 7))) + 1);
+  const requiredMonthlyAverage = roundHalf(remainingContractHours / remainingMonths);
+  const completedSollSessions = kal.filter(r => r.zaehlt && r.date <= todayStr && (logDates.has(r.date) || !!r.absenceType)).length;
+  const totalSollSessionsToDate = kal.filter(r => r.zaehlt && r.date <= todayStr).length;
+  const completionRate = totalSollSessionsToDate > 0 ? Math.round((completedSollSessions / totalSollSessionsToDate) * 100) : 100;
+  return {
+    kal,
+    rawIstTotal,
+    istTotal,
+    absenceCreditHours,
+    totalSoll,
+    sollHeute,
+    diff,
+    puffer,
+    pufferRest,
+    missed,
+    logDates,
+    yearLogs,
+    previousYearHours: previousLogs.reduce((sum, l) => sum + l.hours, 0),
+    totalWorkloadSoll,
+    baseWorkloadToDate,
+    effectiveTrainingTarget,
+    holidayVacationCreditPlannedHours,
+    workloadPuffer,
+    remainingContractHours,
+    requiredMonthlyAverage,
+    completedSollSessions,
+    totalSollSessionsToDate,
+    completionRate,
+    absenceDays: kal.filter(r => r.absenceType && r.date <= todayStr),
+    monthSollHours,
+    monthScheduledAbsenceCredits,
+    monthHolidayVacationPlanCredits,
+    dailyVacationCredit,
+    defaultVacationDates
+  };
 }
 
 // ── Render sidebar ────────────────────────────────────────────────────────────
@@ -420,7 +839,7 @@ function renderSidebar() {
   ul.innerHTML = '';
   state.users.forEach(u => {
     const stats = computeStats(u);
-    const pct = Math.round(stats.istTotal / u.kontingent * 100);
+    const pct = Math.round(stats.istTotal / Math.max(stats.effectiveTrainingTarget || 1, 1) * 100);
     const isActive = u.id === state.activeUserId;
     const initials = u.name.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);
     const btn = document.createElement('button');
@@ -429,11 +848,15 @@ function renderSidebar() {
       <div class="user-avatar" style="background:${u.color}22;color:${u.color}">${initials}</div>
       <div class="user-info">
         <div class="user-name">${u.name}</div>
-        <div class="user-meta">${stats.istTotal}h / ${u.kontingent}h · ${pct}%</div>
+        <div class="user-meta">${formatHours(stats.istTotal)}h / ${formatHours(stats.effectiveTrainingTarget)}h · ${pct}%</div>
       </div>
       <div class="user-status" style="background:${stats.diff >= 0 ? 'var(--green)' : 'var(--red)'}"></div>
     `;
-    btn.onclick = () => { state.activeUserId = u.id; renderAll(); };
+    btn.onclick = () => {
+      state.activeUserId = u.id;
+      saveState();
+      renderAll();
+    };
     ul.appendChild(btn);
   });
 }
@@ -451,7 +874,7 @@ function renderAll() {
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px">
       <div>
         <h2 style="font-size:22px;font-weight:600">${user.name}</h2>
-        <p style="color:var(--text3);font-size:13px;font-family:var(--mono);margin-top:3px">${user.kontingent}h Jahreskontingent · ${normalizeTrainings(user).map(t=>`${WEEKDAYS[t.wd]} ${t.sollHours}h`).join(' · ')}</p>
+        <p style="color:var(--text3);font-size:13px;font-family:var(--mono);margin-top:3px">${formatHours(computeStats(user).effectiveTrainingTarget)}h Trainingsziel bei ${formatHours(user.kontingent)}h Vertragsziel · ${getUserPlanSummary(user)}</p>
       </div>
       <div style="display:flex;gap:8px">
         <button class="btn-secondary" onclick="renderSetup('${user.id}')">⚙ Einstellungen</button>
@@ -466,7 +889,11 @@ function renderAll() {
   `;
   renderTab(user);
 }
-function switchTab(tab) { currentTab = tab; renderAll(); }
+function switchTab(tab) {
+  currentTab = tab;
+  saveState();
+  renderAll();
+}
 function renderTab(user) {
   const stats = computeStats(user);
   if (currentTab === 'dashboard') renderDashboard(user, stats);
@@ -476,48 +903,180 @@ function renderTab(user) {
 
 // ── Dashboard ─────────────────────────────────────────────────────────────────
 function renderDashboard(user, stats) {
-  const {istTotal, totalSoll, sollHeute, diff, puffer, pufferRest, missed} = stats;
-  const pct = Math.min(100, Math.round(istTotal / user.kontingent * 100));
+  const {rawIstTotal, istTotal, absenceCreditHours, totalSoll, sollHeute, diff, puffer, pufferRest, missed, absenceDays, remainingContractHours, requiredMonthlyAverage, completionRate, completedSollSessions, totalSollSessionsToDate, effectiveTrainingTarget, holidayVacationCreditPlannedHours, totalWorkloadSoll, baseWorkloadToDate, workloadPuffer, yearLogs, previousYearHours} = stats;
+  const defaultVacationDays = getDefaultVacationDaysCount(user);
+  const pct = Math.min(100, Math.round(istTotal / Math.max(effectiveTrainingTarget || 1, 1) * 100));
   const diffClass = diff >= 0 ? 'green' : 'red';
   const diffSign = diff >= 0 ? '+' : '';
-  const pufferClass = pufferRest >= 0 ? 'green' : 'red';
+  const pufferClass = workloadPuffer >= 0 ? 'green' : 'red';
   const months = ['Jan','Feb','Mär','Apr','Mai','Jun','Jul','Aug','Sep','Okt','Nov','Dez'];
-  const monthCards = months.map((mn, mi) => {
-    const mSoll = stats.kal.filter(r=>r.zaehlt && monthIndexFromISO(r.date)===mi).reduce((s,r)=>s+r.sollHours,0);
-    const mIst  = user.log.filter(l=>monthIndexFromISO(l.date)===mi).reduce((s,l)=>s+l.hours,0);
-    const mDiff = mIst - mSoll;
-    const ferienInMonth = stats.kal.some(r=>r.ferienName && monthIndexFromISO(r.date)===mi);
-    const diffColor = mDiff >= 0 ? 'var(--green)' : mSoll===0 ? 'var(--text3)' : 'var(--red)';
+  const targetToday = sollHeute;
+  const trackDelta = roundHalf(istTotal - targetToday);
+  const trackStatus = trackDelta >= 3 ? 'vor Ziel' : trackDelta <= -3 ? 'hinter Ziel' : 'im Korridor';
+  const trackColor = trackDelta >= 3 ? 'var(--green)' : trackDelta <= -3 ? 'var(--red)' : 'var(--amber)';
+  const trackBg = trackDelta >= 3 ? 'rgba(52,211,153,0.12)' : trackDelta <= -3 ? 'rgba(248,113,113,0.12)' : 'rgba(251,191,36,0.12)';
+  const monthTrack = months.map((mn, mi) => {
+    const monthSollBase = stats.monthSollHours[mi];
+    const monthVacationCredit = stats.monthHolidayVacationPlanCredits[mi];
+    const monthIstRaw = yearLogs.filter(l=>monthIndexFromISO(l.date)===mi).reduce((s,l)=>s+l.hours,0);
+    const monthAbsenceCredit = stats.monthScheduledAbsenceCredits[mi];
+    const monthIst = monthIstRaw + monthAbsenceCredit;
+    const monthContractTargetBase = monthSollBase;
+    const monthContractTarget = totalWorkloadSoll > 0 ? (monthSollBase / totalWorkloadSoll) * effectiveTrainingTarget : 0;
+    return {
+      name: mn,
+      sollBase: monthSollBase,
+      soll: monthContractTarget,
+      ist: monthIst,
+      vacationCredit: monthVacationCredit,
+      contractTargetBase: monthContractTargetBase,
+      contractTarget: monthContractTarget
+    };
+  });
+  let chartTargetCum = 0;
+  let chartTargetBaseCum = 0;
+  let chartIstCum = 0;
+  const chartPoints = monthTrack.map((row, idx) => {
+    chartTargetBaseCum += row.contractTargetBase;
+    chartTargetCum += row.contractTarget;
+    chartIstCum += row.ist;
+    return {
+      label: row.name,
+      monthIndex: idx,
+      targetBaseCum: chartTargetBaseCum,
+      targetCum: chartTargetCum,
+      istCum: chartIstCum
+    };
+  });
+  const chartMax = Math.max(user.kontingent, ...chartPoints.flatMap(p => [p.targetBaseCum, p.targetCum, p.istCum]), 1);
+  const chartWidth = 760;
+  const chartHeight = 240;
+  const padX = 32;
+  const padY = 20;
+  const plotWidth = chartWidth - padX * 2;
+  const plotHeight = chartHeight - padY * 2;
+  const xFor = idx => padX + (chartPoints.length === 1 ? plotWidth / 2 : (idx / (chartPoints.length - 1)) * plotWidth);
+  const yFor = value => chartHeight - padY - (value / chartMax) * plotHeight;
+  const targetBasePath = chartPoints.map((p, idx) => `${idx === 0 ? 'M' : 'L'} ${xFor(idx).toFixed(1)} ${yFor(p.targetBaseCum).toFixed(1)}`).join(' ');
+  const targetPath = chartPoints.map((p, idx) => `${idx === 0 ? 'M' : 'L'} ${xFor(idx).toFixed(1)} ${yFor(p.targetCum).toFixed(1)}`).join(' ');
+  const istPath = chartPoints.map((p, idx) => `${idx === 0 ? 'M' : 'L'} ${xFor(idx).toFixed(1)} ${yFor(p.istCum).toFixed(1)}`).join(' ');
+  const chartGrid = [0, 0.25, 0.5, 0.75, 1].map(step => {
+    const value = Math.round(chartMax * step);
+    const y = yFor(value);
+    return `<g>
+      <line x1="${padX}" y1="${y.toFixed(1)}" x2="${chartWidth - padX}" y2="${y.toFixed(1)}" stroke="rgba(255,255,255,0.08)" stroke-width="1" />
+      <text x="${padX - 8}" y="${(y + 4).toFixed(1)}" text-anchor="end" fill="var(--text3)" font-size="10" font-family="var(--mono)">${value}h</text>
+    </g>`;
+  }).join('');
+  const chartDots = chartPoints.map((p, idx) => `
+    <g>
+      <circle cx="${xFor(idx).toFixed(1)}" cy="${yFor(p.targetCum).toFixed(1)}" r="3.5" fill="var(--accent)" />
+      <circle cx="${xFor(idx).toFixed(1)}" cy="${yFor(p.targetBaseCum).toFixed(1)}" r="3.5" fill="var(--amber)" />
+      <circle cx="${xFor(idx).toFixed(1)}" cy="${yFor(p.istCum).toFixed(1)}" r="3.5" fill="var(--green)" />
+      <text x="${xFor(idx).toFixed(1)}" y="${chartHeight - 4}" text-anchor="middle" fill="var(--text3)" font-size="10" font-family="var(--mono)">${p.label}</text>
+    </g>
+  `).join('');
+  let runningContractTarget = 0;
+  let runningIst = 0;
+  const trackCards = monthTrack.map(({ name, soll, ist, contractTarget, vacationCredit }) => {
+    runningContractTarget += contractTarget;
+    runningIst += ist;
+    const status = runningIst - runningContractTarget;
+    const statusColor = status >= 0 ? 'var(--green)' : 'var(--red)';
+    const statusLabel = status >= 0 ? `+${formatHours(status)}h` : `${formatHours(status)}h`;
     return `
       <div class="month-card">
-        <div class="month-name">${mn} ${ferienInMonth?'<span class="month-badge">Ferien</span>':''}</div>
+        <div class="month-name">${name}</div>
         <div class="month-stats">
-          <div class="month-stat"><div class="month-stat-val" style="color:var(--accent)">${mSoll}h</div><div class="month-stat-lbl">Soll</div></div>
-          <div class="month-stat"><div class="month-stat-val">${mIst}h</div><div class="month-stat-lbl">Ist</div></div>
-          <div class="month-stat"><div class="month-stat-val" style="color:${diffColor}">${mSoll===0?'–':(mDiff>=0?'+':'')+mDiff+'h'}</div><div class="month-stat-lbl">Diff</div></div>
+          <div class="month-stat"><div class="month-stat-val" style="color:var(--accent)">${formatHours(contractTarget)}h</div><div class="month-stat-lbl">Monatsziel</div></div>
+          <div class="month-stat"><div class="month-stat-val">${formatHours(runningIst)}h</div><div class="month-stat-lbl">Ist kum.</div></div>
+          <div class="month-stat"><div class="month-stat-val" style="color:${statusColor}">${statusLabel}</div><div class="month-stat-lbl">On Track</div></div>
         </div>
+        <div style="margin-top:10px;font-size:11px;color:var(--text3);font-family:var(--mono)">Trainingsziel ${formatHours(soll)}h · Urlaubsanteil ${formatHours(vacationCredit)}h · Ziel kum. ${formatHours(runningContractTarget)}h</div>
+      </div>`;
+  }).join('');
+  const monthCards = months.map((mn, mi) => {
+    const mSoll = stats.monthSollHours[mi];
+    const mTarget = monthTrack[mi].contractTarget;
+    const mIstRaw  = yearLogs.filter(l=>monthIndexFromISO(l.date)===mi).reduce((s,l)=>s+l.hours,0);
+    const mAbsenceCredit = stats.monthScheduledAbsenceCredits[mi];
+    const mIst  = mIstRaw + mAbsenceCredit;
+    const mCustom = yearLogs.filter(l=>monthIndexFromISO(l.date)===mi && getLogEntryType(user, l)==='custom').length;
+    const mDiff = mIst - mTarget;
+    const ferienInMonth = stats.kal.some(r=>r.ferienName && monthIndexFromISO(r.date)===mi);
+    const absencesInMonth = stats.kal.filter(r => r.absenceType && monthIndexFromISO(r.date)===mi && r.date <= today()).length;
+    const diffColor = mDiff >= 0 ? 'var(--green)' : mTarget===0 ? 'var(--text3)' : 'var(--red)';
+    return `
+      <div class="month-card">
+        <div class="month-name">${mn} <span style="display:flex;gap:6px">${mCustom?'<span class="month-badge" style="background:var(--amber-bg);color:var(--amber)">Sonder '+mCustom+'</span>':''}${absencesInMonth?'<span class="month-badge" style="background:rgba(79,156,249,.12);color:var(--accent)">Abwesenheit '+absencesInMonth+'</span>':''}${ferienInMonth?'<span class="month-badge">Ferien</span>':''}</span></div>
+        <div class="month-stats">
+          <div class="month-stat"><div class="month-stat-val" style="color:var(--accent)">${formatHours(mSoll)}h</div><div class="month-stat-lbl">Soll</div></div>
+          <div class="month-stat"><div class="month-stat-val">${formatHours(mIst)}h</div><div class="month-stat-lbl">Ist inkl. Anrechnung</div></div>
+          <div class="month-stat"><div class="month-stat-val" style="color:${diffColor}">${mTarget===0?'–':(mDiff>=0?'+':'')+formatHours(mDiff)+'h'}</div><div class="month-stat-lbl">Diff vs. Ziel</div></div>
+        </div>
+        <div style="margin-top:10px;font-size:11px;color:var(--text3);font-family:var(--mono)">Trainingsziel ${formatHours(mTarget)}h</div>
       </div>`;
   }).join('');
   document.getElementById('tabContent').innerHTML = `
     <div class="kpi-grid">
-      <div class="kpi blue"><div class="kpi-label">Soll bis heute</div><div class="kpi-value">${sollHeute}h</div><div class="kpi-sub">laut Soll-Kalender</div></div>
-      <div class="kpi"><div class="kpi-label">Geleistet</div><div class="kpi-value">${istTotal}h</div><div class="kpi-sub">von ${user.kontingent}h Ziel</div></div>
-      <div class="kpi ${diffClass}"><div class="kpi-label">Differenz</div><div class="kpi-value">${diffSign}${diff}h</div><div class="kpi-sub">${diff>=0?'du liegst vorne':'du liegst hinten'}</div></div>
-      <div class="kpi ${pufferClass}"><div class="kpi-label">Verbleibender Puffer</div><div class="kpi-value">${pufferRest}h</div><div class="kpi-sub">von ${puffer}h total · ${missed.length} Sessions ausgefallen</div></div>
+      <div class="kpi blue"><div class="kpi-label">Soll-Stunden bis jetzt</div><div class="kpi-value">${formatHours(baseWorkloadToDate)}h</div><div class="kpi-sub">laut Kalender tatsaechlich zu leistende Trainings</div></div>
+      <div class="kpi blue"><div class="kpi-label">Trainingsziel bis heute</div><div class="kpi-value">${formatHours(sollHeute)}h</div><div class="kpi-sub">anteilig aus dem reduzierten Jahresziel</div></div>
+      <div class="kpi"><div class="kpi-label">Ist inkl. Anrechnung</div><div class="kpi-value">${formatHours(istTotal)}h</div><div class="kpi-sub">${formatHours(rawIstTotal)}h Trainingslog + ${formatHours(absenceCreditHours)}h Krank/Urlaub angerechnet</div></div>
+      <div class="kpi ${pufferClass}"><div class="kpi-label">Puffer</div><div class="kpi-value">${formatHours(workloadPuffer)}h</div><div class="kpi-sub">Sollstunden ${formatHours(totalWorkloadSoll)}h + Urlaub ${formatHours(holidayVacationCreditPlannedHours)}h - Vertragsziel ${formatHours(user.kontingent)}h</div></div>
     </div>
+    <div class="kpi-grid" style="margin-top:14px">
+      <div class="kpi ${diffClass}"><div class="kpi-label">Differenz</div><div class="kpi-value">${diffSign}${formatHours(diff)}h</div><div class="kpi-sub">${diff>=0?'du liegst vorne':'du liegst hinten'}</div></div>
+      <div class="kpi"><div class="kpi-label">Restziel</div><div class="kpi-value">${formatHours(remainingContractHours)}h</div><div class="kpi-sub">bis zum reduzierten Trainingsziel</div></div>
+      <div class="kpi"><div class="kpi-label">Noetiger Monatsschnitt</div><div class="kpi-value">${formatHours(requiredMonthlyAverage)}h</div><div class="kpi-sub">ab jetzt bis Jahresende</div></div>
+      <div class="kpi"><div class="kpi-label">Soll-Trefferquote</div><div class="kpi-value">${completionRate}%</div><div class="kpi-sub">${completedSollSessions} von ${totalSollSessionsToDate} Soll-Terminen erfasst</div></div>
+    </div>
+    <p style="font-size:12px;color:var(--text3);font-family:var(--mono);margin:10px 2px 0">Vorjahr: ${formatHours(previousYearHours)}h</p>
     <div class="progress-wrap">
       <div class="progress-label">
-        <span>Jahresfortschritt: ${istTotal}h von ${user.kontingent}h Vertragsziel</span>
+        <span>Jahresfortschritt: ${formatHours(istTotal)}h von ${formatHours(effectiveTrainingTarget)}h Trainingsziel</span>
         <span style="color:var(--accent)">${pct}%</span>
       </div>
       <div class="progress-bar-bg"><div class="progress-bar-fill" style="width:${pct}%"></div></div>
       <div class="progress-markers">
-        <span>0h</span><span>${Math.round(user.kontingent*0.25)}h</span><span>${Math.round(user.kontingent*0.5)}h</span><span>${Math.round(user.kontingent*0.75)}h</span><span>${user.kontingent}h</span>
+        <span>0h</span><span>${formatHours(effectiveTrainingTarget*0.25)}h</span><span>${formatHours(effectiveTrainingTarget*0.5)}h</span><span>${formatHours(effectiveTrainingTarget*0.75)}h</span><span>${formatHours(effectiveTrainingTarget)}h</span>
       </div>
     </div>
     <p style="font-size:11px;color:var(--text3);font-family:var(--mono);margin-bottom:12px;text-transform:uppercase;letter-spacing:.06em">
-      Jahres-Soll: ${totalSoll}h · Vertragsziel: ${user.kontingent}h · Puffer: ${puffer}h
+      Sollstunden: ${formatHours(totalWorkloadSoll)}h · Trainingsziel: ${formatHours(totalSoll)}h · Vertragsziel: ${formatHours(user.kontingent)}h · ${defaultVacationDays} Urlaubstage = ${formatHours(holidayVacationCreditPlannedHours)}h Gutschrift · Puffer: ${formatHours(workloadPuffer)}h
     </p>
+    <div class="section-title">Trainingsziel-Fahrplan</div>
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px;padding:14px 16px;border-radius:12px;border:1px solid var(--border);background:${trackBg}">
+      <div>
+        <div style="font-size:11px;color:var(--text3);font-family:var(--mono);text-transform:uppercase;letter-spacing:.05em">Ampel</div>
+        <div style="font-size:20px;font-weight:600;color:${trackColor}">${trackStatus}</div>
+      </div>
+      <div style="text-align:right">
+        <div style="font-size:11px;color:var(--text3);font-family:var(--mono);text-transform:uppercase;letter-spacing:.05em">Korridor heute</div>
+        <div style="font-size:14px;color:var(--text)">${formatHours(targetToday)}h Ziel · ${formatHours(istTotal)}h Ist</div>
+        <div style="font-size:12px;color:${trackColor};font-family:var(--mono)">${trackDelta >= 0 ? '+' : ''}${formatHours(trackDelta)}h gegen Zielkurve</div>
+      </div>
+    </div>
+    <p style="font-size:12px;color:var(--text2);margin-bottom:12px;line-height:1.5">
+      Das Trainingsziel wird aus dem Vertragsziel abgeleitet: Vertragsziel minus pauschale Urlaubsgutschrift. So siehst du, wie viele Trainingsstunden du real geben musst, um zusammen mit ${defaultVacationDays} Urlaubstagen auf das Vertragsziel zu kommen.
+    </p>
+    <div style="background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:16px;margin-bottom:18px">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:10px">
+        <div class="section-title" style="margin:0">Zielkurve</div>
+        <div style="display:flex;gap:14px;font-size:11px;font-family:var(--mono);color:var(--text2);flex-wrap:wrap">
+          <span><span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:var(--accent);margin-right:6px;vertical-align:middle"></span>Trainingsziel mit Urlaub</span>
+          <span><span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:var(--amber);margin-right:6px;vertical-align:middle"></span>Rohe Sollstunden</span>
+          <span><span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:var(--green);margin-right:6px;vertical-align:middle"></span>Ist kumuliert</span>
+        </div>
+      </div>
+      <svg viewBox="0 0 ${chartWidth} ${chartHeight}" style="width:100%;height:auto;display:block">
+        ${chartGrid}
+        <path d="${targetBasePath}" fill="none" stroke="var(--amber)" stroke-width="2" stroke-dasharray="6 6" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="${targetPath}" fill="none" stroke="var(--accent)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="${istPath}" fill="none" stroke="var(--green)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" />
+        ${chartDots}
+      </svg>
+    </div>
+    <div class="month-grid" style="margin-bottom:22px">${trackCards}</div>
     <div class="section-title">Monatsübersicht</div>
     <div class="month-grid">${monthCards}</div>
   `;
@@ -536,10 +1095,19 @@ function renderKalender(user, stats) {
     kal.filter(r => monthIndexFromISO(r.date) === mi).forEach(r => {
       const day = parseInt(r.date.slice(8));
       if (r.ferienName)           dayMap[day] = {type:'ferien', label:r.ferienName.split('/')[0].split(' ')[0]};
+      else if (r.absenceType)     dayMap[day] = {type:r.absenceType, label:r.absenceNote || (r.absenceType==='illness' ? 'Krank' : 'Urlaub')};
       else if (r.date > todayStr) dayMap[day] = {type:'future'};
       else if (logDates.has(r.date)) dayMap[day] = {type:'done'};
       else                        dayMap[day] = {type:'missed'};
     });
+    user.log
+      .filter(l => monthIndexFromISO(l.date) === mi)
+      .forEach(l => {
+        const offPlan = getOffPlanLogs(user, l.date);
+        if (!offPlan.length) return;
+        const day = parseInt(l.date.slice(8), 10);
+        dayMap[day] = { type: 'custom', label: offPlan.map(entry => getLogTrainingLabel(user, entry)).join(', ') };
+      });
     const mSoll   = kal.filter(r=>r.zaehlt && monthIndexFromISO(r.date)===mi).reduce((s,r)=>s+r.sollHours,0);
     const mIst    = user.log.filter(l=>monthIndexFromISO(l.date)===mi).reduce((s,l)=>s+l.hours,0);
     const mDone   = kal.filter(r=>r.zaehlt && r.date<=todayStr && logDates.has(r.date) && monthIndexFromISO(r.date)===mi).length;
@@ -560,11 +1128,14 @@ function renderKalender(user, stats) {
       let bg='', color='', border='', fw='400';
       if (isToday) border = 'box-shadow:inset 0 0 0 1.5px var(--accent)';
       if (!info) { bg = isWeekend ? 'rgba(255,255,255,0.02)' : 'transparent'; color = 'var(--text3)'; }
-      else if (info.type==='ferien')  { bg='rgba(251,191,36,0.12)'; color='var(--amber)'; }
+      else if (info.type==='ferien')  { bg='rgba(168,85,247,0.14)'; color='#c084fc'; fw='600'; }
       else if (info.type==='done')    { bg='rgba(52,211,153,0.12)'; color='var(--green)'; fw='600'; }
       else if (info.type==='missed')  { bg='rgba(248,113,113,0.12)'; color='var(--red)'; fw='600'; }
-      else if (info.type==='future')  { bg='rgba(79,156,249,0.08)'; color='var(--accent)'; }
-      cells += `<button type="button" class="cal-day" onclick="openDayDetails('${user.id}','${ds}')" style="background:${bg};color:${color};font-weight:${fw};border-radius:5px;text-align:center;padding:4px 2px;font-size:12px;font-family:var(--mono);${border}" title="${info?.type==='done'?'✓ geleistet':info?.type==='missed'?'✗ ausgefallen':info?.type==='ferien'?info.label:info?.type==='future'?'ausstehend':'Kein Soll-Termin'}">${day}</button>`;
+      else if (info.type==='illness') { bg='rgba(251,191,36,0.14)'; color='var(--amber)'; fw='600'; }
+      else if (info.type==='vacation'){ bg='rgba(45,212,191,0.14)'; color='#2dd4bf'; fw='600'; }
+      else if (info.type==='custom')  { bg='rgba(244,114,182,0.14)'; color='#f472b6'; fw='600'; }
+      else if (info.type==='future')  { bg='rgba(96,165,250,0.12)'; color='#60a5fa'; fw='600'; }
+      cells += `<button type="button" class="cal-day" onclick="openDayDetails('${user.id}','${ds}')" style="background:${bg};color:${color};font-weight:${fw};border-radius:5px;text-align:center;padding:4px 2px;font-size:12px;font-family:var(--mono);${border}" title="${info?.type==='done'?'✓ geleistet':info?.type==='missed'?'✗ ausgefallen':info?.type==='custom'?'Sondereinsatz':info?.type==='illness'?'Krank':info?.type==='vacation'?'Urlaub':info?.type==='ferien'?info.label:info?.type==='future'?'ausstehend':'Kein Soll-Termin'}">${day}</button>`;
     }
     const diffColor = mSoll===0?'var(--text3)':mIst>=mSoll?'var(--green)':'var(--red)';
     const diffVal   = mSoll===0?'–':(mIst-mSoll>=0?'+':'')+(mIst-mSoll)+'h';
@@ -576,6 +1147,7 @@ function renderKalender(user, stats) {
             ${mDone>0?`<span style="color:var(--green)">✓ ${mDone}</span>`:''}
             ${mMissed>0?`<span style="color:var(--red)">✗ ${mMissed}</span>`:''}
             ${mFuture>0?`<span style="color:var(--accent)">◦ ${mFuture}</span>`:''}
+            ${user.log.some(l=>monthIndexFromISO(l.date)===mi && getOffPlanLogs(user, l.date).length)?`<span style="color:var(--amber)">◆ Sonder</span>`:''}
             ${hasFer?`<span style="color:var(--amber)">⛱ Ferien</span>`:''}
             <span style="color:var(--text3)">Soll ${mSoll}h</span>
             <span style="color:${diffColor}">${diffVal}</span>
@@ -588,8 +1160,11 @@ function renderKalender(user, stats) {
     <div style="display:flex;gap:16px;margin-bottom:18px;font-size:12px;color:var(--text2);align-items:center;font-family:var(--mono);flex-wrap:wrap">
       <span><span style="display:inline-block;width:12px;height:12px;border-radius:2px;background:rgba(52,211,153,.12);border:1px solid rgba(52,211,153,.3);vertical-align:middle;margin-right:4px"></span>Geleistet</span>
       <span><span style="display:inline-block;width:12px;height:12px;border-radius:2px;background:rgba(248,113,113,.12);border:1px solid rgba(248,113,113,.3);vertical-align:middle;margin-right:4px"></span>Ausgefallen</span>
-      <span><span style="display:inline-block;width:12px;height:12px;border-radius:2px;background:rgba(79,156,249,.08);border:1px solid rgba(79,156,249,.2);vertical-align:middle;margin-right:4px"></span>Ausstehend</span>
-      <span><span style="display:inline-block;width:12px;height:12px;border-radius:2px;background:rgba(251,191,36,.12);vertical-align:middle;margin-right:4px"></span>Ferien</span>
+      <span><span style="display:inline-block;width:12px;height:12px;border-radius:2px;background:rgba(251,191,36,.14);border:1px solid rgba(251,191,36,.35);vertical-align:middle;margin-right:4px"></span>Krank</span>
+      <span><span style="display:inline-block;width:12px;height:12px;border-radius:2px;background:rgba(45,212,191,.14);border:1px solid rgba(45,212,191,.35);vertical-align:middle;margin-right:4px"></span>Urlaub</span>
+      <span><span style="display:inline-block;width:12px;height:12px;border-radius:2px;background:rgba(96,165,250,.12);border:1px solid rgba(96,165,250,.35);vertical-align:middle;margin-right:4px"></span>Ausstehend</span>
+      <span><span style="display:inline-block;width:12px;height:12px;border-radius:2px;background:rgba(244,114,182,.14);border:1px solid rgba(244,114,182,.35);vertical-align:middle;margin-right:4px"></span>Sondereinsatz</span>
+      <span><span style="display:inline-block;width:12px;height:12px;border-radius:2px;background:rgba(168,85,247,.14);border:1px solid rgba(168,85,247,.35);vertical-align:middle;margin-right:4px"></span>Ferien</span>
       <span style="margin-left:auto;color:var(--text3)">Heute: <span style="color:var(--accent)">${todayStr}</span></span>
     </div>
     <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px">${monthBlocks}</div>
@@ -599,30 +1174,34 @@ function renderKalender(user, stats) {
 // ── Trainingslog ──────────────────────────────────────────────────────────────
 function renderLog(user, stats) {
   const sorted = [...user.log].sort((a,b)=>b.date.localeCompare(a.date));
-  const trainingName = (entry) => (entry.training || entry.gruppe || 'Training');
   const rows = sorted.map(l => {
-    const gc = 'other';
+    const gc = getLogEntryType(user, l);
     return `<tr>
       <td style="font-family:var(--mono);color:var(--text2)">${l.date}</td>
-      <td><span class="badge ${gc}">${trainingName(l)}</span></td>
+      <td><span class="badge ${gc}">${getLogTrainingLabel(user, l)}</span></td>
       <td>${l.halle||'–'}</td>
       <td style="font-family:var(--mono);color:var(--accent)">${l.hours}h</td>
-      <td><button class="btn-del" onclick="deleteLog('${user.id}','${l.id}')" title="Löschen">×</button></td>
+      <td style="display:flex;gap:6px;justify-content:flex-end"><button class="btn-del" onclick="editLog('${user.id}','${l.id}')" title="Bearbeiten">✎</button><button class="btn-del" onclick="deleteLog('${user.id}','${l.id}')" title="Löschen">×</button></td>
     </tr>`;
   }).join('') || `<tr><td colspan="5"><div class="empty"><p>Noch keine Einträge.</p></div></td></tr>`;
-  const options = [...new Set([
-    ...normalizeTrainings(user).map(t => t.label),
-    ...user.log.map(l => trainingName(l))
-  ])].map(t=>`<option>${t}</option>`).join('');
+  const options = normalizeTrainings(user)
+    .map(t => `<option value="${t.label}">${t.label}</option>`)
+    .join('');
   document.getElementById('tabContent').innerHTML = `
     <div class="log-form">
+      <div class="log-mode-switch">
+        <button type="button" class="log-mode-btn active" data-mode="soll" onclick="setLogMode('soll')">Soll-Training</button>
+        <button type="button" class="log-mode-btn" data-mode="custom" onclick="setLogMode('custom')">Einmalig / Vertretung</button>
+      </div>
       <div class="form-row">
         <div class="form-group"><label>Datum</label><input type="date" id="lf_date" value="${today()}"></div>
-        <div class="form-group"><label>Training</label><select id="lf_training">${options}</select></div>
+        <div class="form-group" id="lf_soll_wrap"><label>Soll-Training</label><select id="lf_training">${options}</select></div>
+        <div class="form-group" id="lf_custom_wrap" style="display:none"><label>Einmaliges Training</label><input type="text" id="lf_custom_training" placeholder="z.B. Vertretung Jugend"></div>
         <div class="form-group"><label>Kletterhalle</label><input type="text" id="lf_halle" placeholder="z.B. Element"></div>
         <div class="form-group"><label>Stunden</label><input type="number" id="lf_hours" value="${defaultLogHours(user)}" min="0.5" max="12" step="0.5" style="width:80px"></div>
         <button class="btn-primary" onclick="addLog('${user.id}')">+ Eintragen</button>
       </div>
+      <div class="log-hint">Soll-Trainings sind deine regulaeren Termine. Einmalige Eintraege sind z.B. Vertretungen.</div>
     </div>
     <div style="background:var(--bg2);border:1px solid var(--border);border-radius:12px;overflow:hidden">
       <table class="log-table">
@@ -637,56 +1216,93 @@ function renderLog(user, stats) {
 function renderSetup(userId) {
   const user = state.users.find(u=>u.id===userId);
   if (!user) return;
-  const trainings = normalizeTrainings(user);
+  const draft = ensureSettingsDraft(user);
   const main = document.getElementById('mainContent');
-  const trainingItems = trainings.map((t, i) => `
-    <div class="training-item">
-      <input type="text" class="tr-name" data-idx="${i}" value="${t.label}" placeholder="Trainingname">
-      <select class="tr-day" data-idx="${i}">${WEEKDAYS.slice(0,6).map((wd, wdIdx)=>`<option value="${wdIdx}" ${wdIdx===t.wd?'selected':''}>${wd}</option>`).join('')}</select>
-      <input type="number" class="tr-hours" data-idx="${i}" min="0.5" step="0.5" value="${t.sollHours}">
-      <button type="button" class="btn-icon" onclick="deleteTraining('${userId}',${i})">×</button>
-    </div>
-  `).join('');
-  const ferienItems = user.ferien.map((f,i) => `
+  const periodItems = draft.schedulePeriods.map((period, periodIdx) => {
+    const t = period.trainings?.[0];
+    if (!t) return '';
+    return `
+      <div style="border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:10px;background:rgba(255,255,255,0.02)">
+        <div style="display:grid;grid-template-columns:1.1fr 1.3fr 0.8fr auto;gap:8px;align-items:end;margin-bottom:10px">
+          <div class="form-group">
+            <label>Training</label>
+            <input type="text" class="tr-name" value="${t.label}" placeholder="Trainingname" oninput="updateDraftTraining('${periodIdx}', 'label', this.value)">
+          </div>
+          <div class="form-group">
+            <label>Tage</label>
+            <div class="training-days">${WEEKDAYS.slice(0,6).map((wd, wdIdx)=>`<button type="button" class="day-chip ${(t.wds || []).includes(wdIdx) ? 'active' : ''}" onclick="toggleDraftTrainingDay(${periodIdx}, ${wdIdx})">${wd}</button>`).join('')}</div>
+          </div>
+          <div class="form-group">
+            <label>Soll (h)</label>
+            <input type="number" class="tr-hours" min="0.5" step="0.5" value="${t.sollHours}" oninput="updateDraftTraining('${periodIdx}', 'sollHours', this.value)">
+          </div>
+          <div style="display:flex;justify-content:flex-end"><button type="button" class="btn-icon" onclick="deleteTraining('${userId}',${periodIdx})">×</button></div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;align-items:end">
+          <div class="form-group">
+            <label>Zeitraum von</label>
+            <input type="date" value="${period.start}" oninput="updateDraftPeriodField(${periodIdx}, 'start', this.value)">
+          </div>
+          <div class="form-group">
+            <label>Bis</label>
+            <input type="date" value="${period.end}" oninput="updateDraftPeriodField(${periodIdx}, 'end', this.value)">
+          </div>
+        </div>
+      </div>
+    `;
+  }).join('');
+  const ferienItems = draft.ferien.map((f,i) => `
     <div class="ferien-item" id="fi_${i}">
-      <input type="text"  class="fi-name"  data-idx="${i}" value="${f.name}"  style="flex:1.2;font-size:12px">
-      <input type="date"  class="fi-start" data-idx="${i}" value="${f.start}" style="flex:1;font-size:12px">
-      <input type="date"  class="fi-end"   data-idx="${i}" value="${f.end}"   style="flex:1;font-size:12px">
+      <input type="text"  class="fi-name"  data-idx="${i}" value="${f.name}"  style="flex:1.2;font-size:12px" oninput="updateDraftFerien(${i}, 'name', this.value)">
+      <input type="date"  class="fi-start" data-idx="${i}" value="${f.start}" style="flex:1;font-size:12px" onchange="updateDraftFerien(${i}, 'start', this.value)">
+      <input type="date"  class="fi-end"   data-idx="${i}" value="${f.end}"   style="flex:1;font-size:12px" onchange="updateDraftFerien(${i}, 'end', this.value)">
       <button class="btn-icon fi-del" data-idx="${i}">×</button>
     </div>`).join('');
+  const absenceItems = draft.absences.map((a, i) => `
+    <div class="ferien-item">
+      <select style="flex:0.9" onchange="updateDraftAbsence(${i}, 'type', this.value)">
+        <option value="illness" ${a.type==='illness'?'selected':''}>Krank</option>
+        <option value="vacation" ${a.type==='vacation'?'selected':''}>Urlaub</option>
+      </select>
+      <input type="date" value="${a.start}" style="flex:1" onchange="updateDraftAbsence(${i}, 'start', this.value)">
+      <input type="date" value="${a.end}" style="flex:1" onchange="updateDraftAbsence(${i}, 'end', this.value)">
+      <input type="text" value="${a.note || ''}" placeholder="Notiz" style="flex:1.2" oninput="updateDraftAbsence(${i}, 'note', this.value)">
+      <button class="btn-icon" onclick="deleteAbsence('${userId}',${i})">×</button>
+    </div>
+  `).join('');
   main.innerHTML = `
     <div style="display:flex;align-items:center;gap:12px;margin-bottom:24px">
-      <button class="btn-secondary" onclick="renderAll()">← Zurück</button>
+      <button class="btn-secondary" onclick="cancelSetup()">← Zurück</button>
       <h2 style="font-size:20px;font-weight:600">Einstellungen: ${user.name}</h2>
+    </div>
+    <div class="setup-status">
+      <strong>${draft.dirty ? 'Ungespeicherte Aenderungen' : 'Gespeichert'}</strong>
+      <span>${draft.dirty ? 'Bitte Speichern, bevor du die Einstellungen verlaesst.' : 'Alle Aenderungen sind in data.json gesichert.'}</span>
     </div>
     <div class="setup-grid">
       <div class="setup-card">
         <h3><span>👤</span> Profil</h3>
         <div class="form-group" style="margin-bottom:14px">
           <label>Name</label>
-          <input type="text" id="s_name" value="${user.name}">
+          <input type="text" id="s_name" value="${draft.name}" oninput="syncSettingsField('name', this.value)">
         </div>
         <div class="form-group-inline" style="margin-bottom:14px">
           <div class="form-group">
             <label>Jahreskontingent (h)</label>
-            <input type="number" id="s_kontingent" value="${user.kontingent}" min="1">
+            <input type="number" id="s_kontingent" value="${draft.kontingent}" min="1" oninput="syncSettingsField('kontingent', this.value)">
           </div>
         </div>
         <div class="form-group" style="margin-bottom:14px">
-          <label>Trainings mit Soll-Zeit</label>
-          <div style="display:grid;grid-template-columns:1.4fr 0.9fr 0.7fr 32px;gap:8px;margin-bottom:6px">
-            <span style="font-size:10px;color:var(--text3);font-family:var(--mono);text-transform:uppercase;letter-spacing:.05em">Training</span>
-            <span style="font-size:10px;color:var(--text3);font-family:var(--mono);text-transform:uppercase;letter-spacing:.05em">Tag</span>
-            <span style="font-size:10px;color:var(--text3);font-family:var(--mono);text-transform:uppercase;letter-spacing:.05em">Soll (h)</span>
-            <span></span>
-          </div>
-          <div class="training-list" id="trainingList">${trainingItems}</div>
-          <button type="button" class="btn-add-ferien" style="margin-top:8px" onclick="addTraining('${userId}')">+ Training hinzufügen</button>
+          <label>Soll-Trainings mit eigenem Zeitraum</label>
+          <div class="setup-summary" style="margin-bottom:10px">${getSettingsSummary(draft)}</div>
+          <div class="training-list" id="trainingList">${periodItems}</div>
+          <div class="setup-muted">Jedes Soll-Training hat seinen eigenen Zeitraum. Ueberschneidungen sind erlaubt.</div>
+          <button type="button" class="btn-add-ferien" style="margin-top:8px" onclick="addTraining('${userId}')">+ Soll-Training hinzufügen</button>
         </div>
         <div class="form-group">
           <label>Farbe</label>
           <div style="display:flex;gap:8px;margin-top:4px">
-            ${AVATARS.map(c=>`<div onclick="setColor('${userId}','${c}')" style="width:28px;height:28px;border-radius:50%;background:${c};cursor:pointer;border:2px solid ${c===user.color?'white':'transparent'};transition:border-color .15s"></div>`).join('')}
+            ${AVATARS.map(c=>`<div onclick="setColor('${userId}','${c}')" style="width:28px;height:28px;border-radius:50%;background:${c};cursor:pointer;border:2px solid ${c===draft.color?'white':'transparent'};transition:border-color .15s"></div>`).join('')}
           </div>
         </div>
       </div>
@@ -701,78 +1317,120 @@ function renderSetup(userId) {
         <div class="ferien-list" id="ferienList">${ferienItems}</div>
         <button class="btn-add-ferien" onclick="addFerien('${userId}')">+ Ferienperiode hinzufügen</button>
       </div>
+      <div class="setup-card">
+        <h3><span>✚</span> Krankheit und Urlaub</h3>
+        <div style="display:grid;grid-template-columns:0.9fr 1fr 1fr 1.2fr 32px;gap:6px;margin-bottom:6px">
+          <span style="font-size:10px;color:var(--text3);font-family:var(--mono);text-transform:uppercase;letter-spacing:.05em">Typ</span>
+          <span style="font-size:10px;color:var(--text3);font-family:var(--mono);text-transform:uppercase;letter-spacing:.05em">Von</span>
+          <span style="font-size:10px;color:var(--text3);font-family:var(--mono);text-transform:uppercase;letter-spacing:.05em">Bis</span>
+          <span style="font-size:10px;color:var(--text3);font-family:var(--mono);text-transform:uppercase;letter-spacing:.05em">Notiz</span>
+          <span></span>
+        </div>
+        <div class="ferien-list">${absenceItems}</div>
+        <button class="btn-add-ferien" onclick="addAbsence('${userId}','illness')">+ Krankheitszeitraum hinzufügen</button>
+        <button class="btn-add-ferien" onclick="addAbsence('${userId}','vacation')" style="margin-top:8px">+ Urlaubszeitraum hinzufügen</button>
+      </div>
     </div>
     <div class="setup-actions">
       <button class="btn-secondary" style="color:var(--red);border-color:rgba(248,113,113,.3)" onclick="deleteUser('${userId}')">Person löschen</button>
-      <button class="btn-secondary" onclick="renderAll()">Abbrechen</button>
+      <button class="btn-secondary" onclick="cancelSetup()">Abbrechen</button>
       <button class="btn-primary" onclick="saveSetup('${userId}')">Speichern</button>
     </div>
   `;
 
-  // Attach ferien event listeners
   const ferienList = document.getElementById('ferienList');
   if (ferienList) {
-    ferienList.addEventListener('change', e => {
-      const el = e.target;
-      const idx = parseInt(el.dataset.idx);
-      if (isNaN(idx)) return;
-      const u = state.users.find(u2=>u2.id===userId);
-      if (!u || !u.ferien[idx]) return;
-      const val = el.value.trim();
-      if (!val) return;
-      if (el.classList.contains('fi-name'))  u.ferien[idx].name  = val;
-      if (el.classList.contains('fi-start')) { if (/^\d{4}-\d{2}-\d{2}$/.test(val)) u.ferien[idx].start = val; }
-      if (el.classList.contains('fi-end'))   { if (/^\d{4}-\d{2}-\d{2}$/.test(val)) u.ferien[idx].end   = val; }
-      saveState();
-    });
     ferienList.addEventListener('click', e => {
       const btn = e.target.closest('.fi-del');
       if (!btn) return;
       const idx = parseInt(btn.dataset.idx);
-      const u = state.users.find(u2=>u2.id===userId);
-      if (!u) return;
-      u.ferien.splice(idx, 1);
-      saveState();
+      if (!settingsDraft) return;
+      settingsDraft.ferien.splice(idx, 1);
       renderSetup(userId);
     });
   }
 }
+function cancelSetup() {
+  settingsDraft = null;
+  renderAll();
+}
 
 function addFerien(userId) {
   const user = state.users.find(u=>u.id===userId);
-  if (user) {
-    user.ferien.push({name:'Neue Ferien', start:today(), end:today()});
-    persistAndToast('Ferien gespeichert', 'Speichern fehlgeschlagen');
-    renderSetup(userId);
-  }
+  if (!user) return;
+  const draft = ensureSettingsDraft(user);
+  draft.ferien.push({name:'Neue Ferien', start:today(), end:today()});
+  markSettingsDirty();
+  renderSetup(userId);
+}
+function addSchedulePeriod(userId) {
+  addTraining(userId);
+}
+function deleteSchedulePeriod(userId, periodIdx) {
+  deleteTraining(userId, periodIdx);
 }
 function addTraining(userId) {
   const user = state.users.find(u=>u.id===userId);
   if (!user) return;
-  const trainings = normalizeTrainings(user);
-  trainings.push({
-    id: `tr_${Date.now()}`,
-    label: 'Training',
-    wd: 0,
-    sollHours: defaultLogHours(user)
+  const draft = ensureSettingsDraft(user);
+  draft.schedulePeriods.push({
+    id: `period_${Date.now()}`,
+    start: YEAR_START,
+    end: YEAR_END,
+    trainings: [{
+      id: `tr_${Date.now()}`,
+      label: `Training ${draft.schedulePeriods.length + 1}`,
+      wds: [0],
+      sollHours: defaultLogHours(user)
+    }]
   });
-  persistAndToast('Training gespeichert', 'Speichern fehlgeschlagen');
+  markSettingsDirty();
   renderSetup(userId);
 }
-function deleteTraining(userId, idx) {
+function deleteTraining(userId, periodIdx) {
   const user = state.users.find(u=>u.id===userId);
   if (!user) return;
-  const trainings = normalizeTrainings(user);
-  trainings.splice(idx, 1);
-  if (trainings.length === 0) {
-    trainings.push({ id: `tr_${Date.now()}`, label: 'Training', wd: 0, sollHours: 3 });
+  const draft = ensureSettingsDraft(user);
+  const period = draft.schedulePeriods[periodIdx];
+  const removed = period?.trainings?.[0];
+  if (!removed) return;
+  if (draft.schedulePeriods.length === 1) {
+    showToast('Mindestens ein Soll-Training erforderlich');
+    return;
   }
-  persistAndToast('Training aktualisiert', 'Speichern fehlgeschlagen');
+  if (removed) {
+    const relatedLogs = (user.log || []).filter(l => getLogTrainingLabel(user, l) === removed.label).length;
+    if (relatedLogs > 0 && !confirm(`Es gibt bereits ${relatedLogs} Log-Eintraege fuer "${removed.label}". Soll das Soll-Training trotzdem geloescht werden?`)) {
+      return;
+    }
+  }
+  draft.schedulePeriods.splice(periodIdx, 1);
+  markSettingsDirty();
+  renderSetup(userId);
+}
+function addAbsence(userId, type) {
+  const user = state.users.find(u=>u.id===userId);
+  if (!user) return;
+  const draft = ensureSettingsDraft(user);
+  draft.absences.push({ id: `abs_${Date.now()}`, type, start: today(), end: today(), note: '' });
+  markSettingsDirty();
+  renderSetup(userId);
+}
+function deleteAbsence(userId, idx) {
+  const user = state.users.find(u=>u.id===userId);
+  if (!user) return;
+  const draft = ensureSettingsDraft(user);
+  draft.absences.splice(idx, 1);
+  markSettingsDirty();
   renderSetup(userId);
 }
 function setColor(userId, color) {
   const user = state.users.find(u=>u.id===userId);
-  if (user) { user.color = color; persistAndToast('Farbe gespeichert', 'Speichern fehlgeschlagen'); renderSetup(userId); renderSidebar(); }
+  if (!user) return;
+  const draft = ensureSettingsDraft(user);
+  draft.color = color;
+  markSettingsDirty();
+  renderSetup(userId);
 }
 
 // ── saveSetup – FIXED ─────────────────────────────────────────────────────────
@@ -785,68 +1443,116 @@ function setColor(userId, color) {
 function saveSetup(userId) {
   const user = state.users.find(u=>u.id===userId);
   if (!user) return;
-
-  // Profile fields – safe null checks throughout
-  const nameEl   = document.getElementById('s_name');
-  const kontEl   = document.getElementById('s_kontingent');
-
-  if (nameEl   && nameEl.value.trim())   user.name            = nameEl.value.trim();
-  if (kontEl) {
-    const k = parseFloat(kontEl.value);
-    if (!isNaN(k) && k > 0)             user.kontingent      = k;
-  }
-
-  // Trainings with per-session soll hours
-  const trainRows = document.querySelectorAll('#trainingList .training-item');
-  if (trainRows.length === 0) {
-    showToast('Mindestens ein Training erforderlich');
+  const draft = ensureSettingsDraft(user);
+  const parsedName = draft.name.trim();
+  const parsedKontingent = parseFloat(draft.kontingent);
+  if (parsedKontingent <= 0 || !Number.isFinite(parsedKontingent)) {
+    showToast('Bitte ein gueltiges Jahreskontingent eingeben');
     return;
   }
-  const parsedTrainings = [];
+  if (draft.schedulePeriods.length === 0) {
+    showToast('Mindestens ein Zeitraum erforderlich');
+    return;
+  }
+  const parsedPeriods = [];
   let invalidTraining = false;
-  trainRows.forEach((row, idx) => {
-    const nameEl2 = row.querySelector('.tr-name');
-    const dayEl = row.querySelector('.tr-day');
-    const hoursEl2 = row.querySelector('.tr-hours');
-    if (!nameEl2 || !dayEl || !hoursEl2) { invalidTraining = true; return; }
-    const label = nameEl2.value.trim() || `Training ${idx+1}`;
-    const wd = parseInt(dayEl.value, 10);
-    const sh = parseFloat(hoursEl2.value);
-    if (!Number.isInteger(wd) || wd < 0 || wd > 5 || !Number.isFinite(sh) || sh <= 0) {
+  let invalidPeriods = false;
+  draft.schedulePeriods.forEach((period, periodIdx) => {
+    const start = (period.start || '').trim();
+    const end = (period.end || '').trim();
+    if (!isValidISODate(start) || !isValidISODate(end) || start > end || !Array.isArray(period.trainings) || period.trainings.length === 0) {
+      invalidPeriods = true;
+      return;
+    }
+    const parsedTrainings = [];
+    period.trainings.forEach((training, idx) => {
+      const label = (training.label || '').trim() || `Training ${idx+1}`;
+      const wds = Array.isArray(training.wds)
+        ? [...new Set(training.wds.map(Number).filter(wd => Number.isInteger(wd) && wd >= 0 && wd <= 5))].sort((a, b) => a - b)
+        : [];
+      const sh = Number.parseFloat(training.sollHours);
+      if (wds.length === 0 || !Number.isFinite(sh) || sh <= 0) {
+        invalidTraining = true;
+        return;
+      }
+      parsedTrainings.push({
+        id: `tr_${periodIdx}_${idx}_${Date.now()}`,
+        label,
+        wds,
+        sollHours: sh
+      });
+    });
+    if (parsedTrainings.length === 0) {
       invalidTraining = true;
       return;
     }
-    parsedTrainings.push({
-      id: `tr_${idx}_${Date.now()}`,
-      label,
-      wd,
-      sollHours: sh
+    parsedPeriods.push({
+      id: period.id || `period_${periodIdx}_${Date.now()}`,
+      start,
+      end,
+      trainings: parsedTrainings
     });
   });
-  if (invalidTraining || parsedTrainings.length === 0) {
+  if (invalidPeriods) {
+    showToast('Bitte gueltige Zeitraeume fuer Soll-Trainings eingeben');
+    return;
+  }
+  if (parsedPeriods.length === 0) {
+    showToast('Mindestens ein Training erforderlich');
+    return;
+  }
+  if (invalidTraining) {
     showToast('Bitte Trainings mit gueltigem Tag und Soll-Stunden > 0 eingeben');
     return;
   }
-  user.trainings = parsedTrainings;
-  normalizeTrainings(user);
-  user.trainDays = [...new Set(user.trainings.map(t => t.wd))];
-  user.hoursPerSession = defaultLogHours(user);
-
-  // Ferien – FIX: guard startEl and endEl for null before accessing .value
-  document.querySelectorAll('#ferienList .ferien-item').forEach(row => {
-    const nameEl2 = row.querySelector('.fi-name');
-    const startEl = row.querySelector('.fi-start');
-    const endEl   = row.querySelector('.fi-end');
-    if (!nameEl2 || !startEl || !endEl) return;   // <-- was missing; caused TypeError crash
-    const idx = parseInt(nameEl2.dataset.idx);
-    if (isNaN(idx) || !user.ferien[idx]) return;
-    if (nameEl2.value.trim())                        user.ferien[idx].name  = nameEl2.value.trim();
-    if (/^\d{4}-\d{2}-\d{2}$/.test(startEl.value)) user.ferien[idx].start = startEl.value;
-    if (/^\d{4}-\d{2}-\d{2}$/.test(endEl.value))   user.ferien[idx].end   = endEl.value;
+  const parsedFerien = [];
+  let invalidFerien = false;
+  draft.ferien.forEach((f, idx) => {
+    const name = (f.name || '').trim() || `Ferien ${idx+1}`;
+    const start = (f.start || '').trim();
+    const end = (f.end || '').trim();
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(start) || !/^\d{4}-\d{2}-\d{2}$/.test(end) || start > end) {
+      invalidFerien = true;
+      return;
+    }
+    parsedFerien.push({ name, start, end });
   });
-
-  // saveState() no longer throws (try-catch inside), so renderAll() is always reached
+  if (invalidFerien) {
+    showToast('Bitte Ferien mit gueltigen Datumswerten eingeben');
+    return;
+  }
+  const parsedAbsences = [];
+  let invalidAbsences = false;
+  draft.absences.forEach((a, idx) => {
+    const start = (a.start || '').trim();
+    const end = (a.end || '').trim();
+    if (!isValidISODate(start) || !isValidISODate(end) || start > end) {
+      invalidAbsences = true;
+      return;
+    }
+    parsedAbsences.push({
+      id: a.id || `abs_${idx}_${Date.now()}`,
+      type: a.type === 'vacation' ? 'vacation' : 'illness',
+      start,
+      end,
+      note: (a.note || '').trim()
+    });
+  });
+  if (invalidAbsences) {
+    showToast('Bitte Krankheit und Urlaub mit gueltigen Datumswerten eingeben');
+    return;
+  }
+  user.name = parsedName || user.name;
+  user.kontingent = parsedKontingent;
+  user.color = draft.color;
+  user.schedulePeriods = parsedPeriods;
+  user.trainings = normalizeTrainings(user);
+  user.trainDays = [...new Set(user.trainings.flatMap(t => t.wds || []))];
+  user.hoursPerSession = user.trainings[0]?.sollHours || 3;
+  user.ferien = parsedFerien;
+  user.absences = parsedAbsences;
   const ok = saveState();
+  settingsDraft = buildSettingsDraft(user);
   renderSidebar();
   renderSetup(userId);
   showToast(ok ? 'Einstellungen gespeichert' : 'Speichern fehlgeschlagen');
@@ -864,14 +1570,19 @@ function addLog(userId) {
   const user = state.users.find(u=>u.id===userId);
   if (!user) return;
   const date   = document.getElementById('lf_date').value;
-  const training = document.getElementById('lf_training').value;
+  const isCustom = document.querySelector('.log-mode-btn.active')?.dataset.mode === 'custom';
+  const selectedTraining = document.getElementById('lf_training')?.value || '';
+  const customTrainingEl = document.getElementById('lf_custom_training');
+  const training = isCustom
+    ? (customTrainingEl?.value || '').trim()
+    : selectedTraining;
   const halle  = document.getElementById('lf_halle').value.trim();
   const hours  = parseFloat(document.getElementById('lf_hours').value);
   if (!date || !training || !Number.isFinite(hours) || hours <= 0) {
     showToast('Bitte gueltige Stunden > 0 eintragen');
     return;
   }
-  user.log.push({ id:'l'+Date.now(), date, training, halle, hours });
+  user.log.push({ id:'l'+Date.now(), date, training, halle, hours, type: isCustom ? 'custom' : 'scheduled' });
   if (!saveState()) {
     user.log.pop();
     showToast('Speichern fehlgeschlagen');
@@ -879,6 +1590,57 @@ function addLog(userId) {
   }
   renderAll();
   showToast('Trainingseintrag gespeichert');
+}
+function editLog(userId, logId) {
+  const user = state.users.find(u=>u.id===userId);
+  const entry = user?.log.find(l => l.id === logId);
+  if (!user || !entry) return;
+  editingLog = { userId, logId };
+  const select = document.getElementById('el_training_select');
+  if (select) {
+    select.innerHTML = normalizeTrainings(user)
+      .map(t => `<option value="${t.label}">${t.label}</option>`)
+      .join('');
+  }
+  document.getElementById('el_date').value = entry.date || today();
+  const trainingLabel = getLogTrainingLabel(user, entry);
+  document.getElementById('el_training').value = trainingLabel;
+  if (getLogEntryType(user, entry) === 'custom') {
+    setEditLogMode('custom');
+  } else {
+    setEditLogMode('scheduled');
+    if (select) select.value = trainingLabel;
+  }
+  document.getElementById('el_halle').value = entry.halle || '';
+  document.getElementById('el_hours').value = entry.hours || defaultLogHours(user);
+  document.getElementById('editLogModal').classList.add('open');
+}
+function saveEditedLog() {
+  if (!editingLog) return;
+  const user = state.users.find(u=>u.id===editingLog.userId);
+  const entry = user?.log.find(l => l.id === editingLog.logId);
+  if (!user || !entry) return;
+  const date = document.getElementById('el_date').value;
+  const isCustom = document.querySelector('[data-edit-mode].active')?.dataset.editMode === 'custom';
+  const training = isCustom
+    ? document.getElementById('el_training').value.trim()
+    : (document.getElementById('el_training_select').value || '').trim();
+  const halle = document.getElementById('el_halle').value.trim();
+  const hours = parseFloat(document.getElementById('el_hours').value);
+  if (!date || !training || !Number.isFinite(hours) || hours <= 0) {
+    showToast('Bitte gueltige Daten eintragen');
+    return;
+  }
+  entry.date = date;
+  entry.training = training;
+  entry.halle = halle;
+  entry.hours = hours;
+  entry.type = isCustom ? 'custom' : 'scheduled';
+  saveState();
+  editingLog = null;
+  closeModal('editLogModal');
+  renderAll();
+  showToast('Trainingseintrag aktualisiert');
 }
 function deleteLog(userId, logId) {
   const user = state.users.find(u=>u.id===userId);
@@ -906,8 +1668,20 @@ function openDayDetails(userId, dateStr) {
   const daySoll = dayRows.filter(r=>r.zaehlt).reduce((s,r)=>s+r.sollHours,0);
   const labels = [...new Set(dayRows.map(r=>r.trainingLabel).filter(Boolean))];
   const labelText = labels.length ? ` (${labels.join(', ')})` : '';
+  const offPlanLogs = getOffPlanLogs(user, dateStr);
   if (dayRows.some(r => r.ferienName)) {
     statusText = `Ferien: ${dayRows.find(r => r.ferienName)?.ferienName || 'Ferien'}${labelText}`;
+    statusColor = 'var(--amber)';
+  } else if (dayRows.some(r => r.absenceType === 'illness')) {
+    const note = dayRows.find(r => r.absenceNote)?.absenceNote;
+    statusText = `Krankheit${note ? ` · ${note}` : ''}${labelText}`;
+    statusColor = 'var(--red)';
+  } else if (dayRows.some(r => r.absenceType === 'vacation')) {
+    const note = dayRows.find(r => r.absenceNote)?.absenceNote;
+    statusText = `Urlaub${note ? ` · ${note}` : ''}${labelText}`;
+    statusColor = 'var(--accent)';
+  } else if (offPlanLogs.length > 0 && dayRows.length === 0) {
+    statusText = `Zusatztermin / Vertretung · ${offPlanLogs.reduce((sum, l) => sum + l.hours, 0)}h`;
     statusColor = 'var(--amber)';
   } else if (dayRows.length > 0 && dateStr > todayStr) {
     statusText = `Ausstehender Soll-Termin · ${daySoll}h${labelText}`;
@@ -923,7 +1697,7 @@ function openDayDetails(userId, dateStr) {
     ? dayLogs.map(l => `
       <div class="day-log-card">
         <div class="day-log-meta">
-          <strong>${l.training || l.gruppe || 'Training'}</strong>
+          <strong style="display:flex;align-items:center;gap:8px">${getLogTrainingLabel(user, l)}${getLogEntryType(user, l)==='custom' ? '<span class="badge custom">Einmalig</span>' : ''}</strong>
           <span>${l.hours}h</span>
         </div>
         <div class="day-log-halle">${l.halle || 'Halle nicht gesetzt'}</div>
@@ -947,9 +1721,9 @@ function openNewUserModal() {
   document.getElementById('nu_name').value = '';
   document.getElementById('nu_kontingent').value = '320';
   newUserTrainings = [
-    { label: 'Training 1', wd: 0, sollHours: 3 },
-    { label: 'Training 2', wd: 1, sollHours: 3 },
-    { label: 'Training 3', wd: 4, sollHours: 3 }
+    { label: 'Training 1', wds: [0], sollHours: 3 },
+    { label: 'Training 2', wds: [1], sollHours: 3 },
+    { label: 'Training 3', wds: [4], sollHours: 3 }
   ];
   renderNewUserTrainingList();
   document.getElementById('newUserModal').classList.add('open');
@@ -961,19 +1735,31 @@ function renderNewUserTrainingList() {
   list.innerHTML = newUserTrainings.map((t, i) => `
     <div class="training-item">
       <input type="text" class="nu-tr-name" data-idx="${i}" value="${t.label}" placeholder="Trainingname">
-      <select class="nu-tr-day" data-idx="${i}">${WEEKDAYS.slice(0,6).map((wd, wdIdx)=>`<option value="${wdIdx}" ${wdIdx===t.wd?'selected':''}>${wd}</option>`).join('')}</select>
+      <div class="training-days">${WEEKDAYS.slice(0,6).map((wd, wdIdx)=>`<button type="button" class="day-chip ${(t.wds || []).includes(wdIdx) ? 'active' : ''}" onclick="toggleNewUserTrainingDay(${i}, ${wdIdx})">${wd}</button>`).join('')}</div>
       <input type="number" class="nu-tr-hours" data-idx="${i}" min="0.5" step="0.5" value="${t.sollHours}">
-      <button type="button" class="btn-icon nu-tr-del" data-idx="${i}" onclick="deleteNewUserTraining(${i})">×</button>
+      <div style="display:flex;justify-content:flex-end"><button type="button" class="btn-icon nu-tr-del" data-idx="${i}" onclick="deleteNewUserTraining(${i})">×</button></div>
     </div>
   `).join('');
 }
 function addNewUserTraining() {
-  newUserTrainings.push({ label: `Training ${newUserTrainings.length+1}`, wd: 0, sollHours: 3 });
+  newUserTrainings.push({ label: `Training ${newUserTrainings.length+1}`, wds: [0], sollHours: 3 });
+  renderNewUserTrainingList();
+}
+function toggleNewUserTrainingDay(idx, wd) {
+  const training = newUserTrainings[idx];
+  if (!training) return;
+  const days = training.wds || [];
+  if (days.includes(wd)) {
+    if (days.length === 1) return;
+    training.wds = days.filter(d => d !== wd);
+  } else {
+    training.wds = [...days, wd].sort((a, b) => a - b);
+  }
   renderNewUserTrainingList();
 }
 function deleteNewUserTraining(idx) {
   newUserTrainings.splice(idx, 1);
-  if (newUserTrainings.length === 0) newUserTrainings.push({ label: 'Training 1', wd: 0, sollHours: 3 });
+  if (newUserTrainings.length === 0) newUserTrainings.push({ label: 'Training 1', wds: [0], sollHours: 3 });
   renderNewUserTrainingList();
 }
 function createUser() {
@@ -983,19 +1769,27 @@ function createUser() {
   const parsed = [];
   rows.forEach((row, idx) => {
     const nameEl = row.querySelector('.nu-tr-name');
-    const dayEl = row.querySelector('.nu-tr-day');
     const hoursEl = row.querySelector('.nu-tr-hours');
-    if (!nameEl || !dayEl || !hoursEl) return;
+    if (!nameEl || !hoursEl) return;
     const label = nameEl.value.trim() || `Training ${idx+1}`;
-    const wd = parseInt(dayEl.value, 10);
+    const source = newUserTrainings[idx] || {};
+    const wds = Array.isArray(source.wds)
+      ? [...new Set(source.wds.map(Number).filter(wd => Number.isInteger(wd) && wd >= 0 && wd <= 5))].sort((a, b) => a - b)
+      : [];
     const sollHours = parseFloat(hoursEl.value);
-    if (!Number.isInteger(wd) || wd < 0 || wd > 5) return;
+    if (wds.length === 0) return;
     if (!Number.isFinite(sollHours) || sollHours <= 0) return;
-    parsed.push({ id: `tr_${Date.now()}_${idx}`, label, wd, sollHours });
+    parsed.push({ id: `tr_${Date.now()}_${idx}`, label, wds, sollHours });
   });
-  const trainings = parsed.length ? parsed : [{ id: `tr_${Date.now()}_0`, label: 'Training 1', wd: 0, sollHours: 3 }];
+  const trainings = parsed.length ? parsed : [{ id: `tr_${Date.now()}_0`, label: 'Training 1', wds: [0], sollHours: 3 }];
   const defaultHours = trainings[0].sollHours;
-  const normalizedTrainDays = [...new Set(trainings.map(t => t.wd))];
+  const normalizedTrainDays = [...new Set(trainings.flatMap(t => t.wds || []))];
+  const schedulePeriods = trainings.map((training, idx) => ({
+    id: `period_${Date.now()}_${idx}`,
+    start: YEAR_START,
+    end: YEAR_END,
+    trainings: [{ ...training }]
+  }));
   const user = {
     id: 'user_'+Date.now(),
     name,
@@ -1004,7 +1798,9 @@ function createUser() {
     trainDays: normalizedTrainDays,
     color: AVATARS[state.users.length % AVATARS.length],
     trainings,
+    schedulePeriods,
     ferien: JSON.parse(JSON.stringify(DEFAULT_FERIEN)),
+    absences: [],
     log: []
   };
   state.users.push(user);
@@ -1035,6 +1831,9 @@ document.getElementById('nu_training_list').addEventListener('click', function(e
 document.getElementById('dayDetailModal').addEventListener('click', function(e) {
   if (e.target === this) closeModal('dayDetailModal');
 });
+document.getElementById('editLogModal').addEventListener('click', function(e) {
+  if (e.target === this) closeModal('editLogModal');
+});
 
 // ── Export / Import ───────────────────────────────────────────────────────────
 function exportData() {
@@ -1063,6 +1862,8 @@ function importData(input) {
       }
       if (!confirm(`${imported.users.length} Person(en) importieren? Aktuelle Daten werden überschrieben.`)) return;
       state = imported;
+      settingsDraft = null;
+      migrateUsersData();
       if (!state.activeUserId && state.users.length > 0) state.activeUserId = state.users[0].id;
       saveState();
       renderAll();
@@ -1076,18 +1877,37 @@ function importData(input) {
   input.value = '';
 }
 
+async function quitApp() {
+  const ok = confirm('App beenden? Ungespeicherte Aenderungen werden vorher gespeichert.');
+  if (!ok) return;
+  saveState();
+  try {
+    await fetch('/api/shutdown', { method: 'POST' });
+  } catch (err) {
+    console.warn('Shutdown fehlgeschlagen:', err);
+  }
+  showToast('App wird beendet');
+  setTimeout(() => {
+    window.close();
+    setTimeout(() => {
+      location.href = 'about:blank';
+    }, 150);
+  }, 200);
+}
+
 // ── Reset ─────────────────────────────────────────────────────────────────────
 function resetApp() {
   if (!confirm('Alle Daten löschen und App zurücksetzen?')) return;
-  try { localStorage.removeItem(STORAGE_KEY); } catch(e) {}
   state = { users: [], activeUserId: null };
-  seedDefaultUser();
+  settingsDraft = null;
+  saveState();
   renderAll();
 }
 
 // ── Init ──────────────────────────────────────────────────────────────────────
 loadState();
-seedDefaultUser();
+migrateUsersData();
+migrateLegacyLogEntries();
 renderAll();
 </script>
 </body>
